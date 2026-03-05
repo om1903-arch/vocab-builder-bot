@@ -128,7 +128,7 @@ const Assessment = () => {
             <CardContent className="space-y-6">
               <div className="text-6xl font-bold text-primary">{levelLabels[level]}</div>
               <p className="text-muted-foreground">
-                أجبت على {answers.filter((a, i) => a === questions[i].correct).length} من {questions.length} إجابة صحيحة
+                أجبت على {answers.filter((a, i) => questions[i] && a === questions[i].correct).length} من {questions.length} إجابة صحيحة
               </p>
               <Button onClick={() => navigate('/dashboard')} size="lg">
                 ابدأ التعلم 🚀
