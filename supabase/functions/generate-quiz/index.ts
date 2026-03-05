@@ -38,7 +38,7 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: "You are an English reading comprehension quiz generator. Generate questions based on articles. Always respond with valid JSON only.",
+            content: "You are an English reading comprehension quiz generator. Generate thorough questions that cover ALL parts of the article. Always respond with valid JSON only.",
           },
           {
             role: "user",
@@ -46,7 +46,12 @@ serve(async (req) => {
 
 ${content}
 
-Generate 4 multiple-choice comprehension questions. Each question should test understanding of the article content.
+Generate 6-8 multiple-choice comprehension questions that thoroughly cover the ENTIRE article. Include questions about:
+- Main idea and purpose
+- Key details from different paragraphs
+- Vocabulary in context
+- Inference and critical thinking
+- Author's tone or perspective
 
 Return ONLY valid JSON:
 {
