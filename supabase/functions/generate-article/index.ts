@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -18,12 +19,32 @@ const categoryNames: Record<string, string> = {
   science: "Science & Discovery",
   sport: "Sports & Fitness",
   culture: "Culture & Society",
+  health: "Health & Wellness",
+  business: "Business & Economy",
+  travel: "Travel & Geography",
+  history: "History & Civilizations",
+  environment: "Environment & Nature",
+  food: "Food & Cooking",
 };
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
+    // Validate JWT
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+    const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claims, error: authError } = await supabase.auth.getClaims(token);
+    if (authError || !claims?.claims) {
+      return new Response(JSON.stringify({ error: "Invalid token" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
     const { category, level } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
@@ -42,7 +63,7 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: `You are an English language teaching content creator. Generate educational articles for English learners. Always respond with valid JSON only, no markdown.`,
+            content: "You are an English language teaching content creator. Generate educational articles for English learners. Always respond with valid JSON only, no markdown.",
           },
           {
             role: "user",
@@ -73,15 +94,8 @@ The key_words should be 5-8 important vocabulary words from the article that the
 
     const data = await response.json();
     const content = data.choices?.[0]?.message?.content;
-    
-    // Parse the JSON from the response, handling potential markdown code blocks
-    let parsed;
-    try {
-      const cleaned = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-      parsed = JSON.parse(cleaned);
-    } catch {
-      throw new Error("Failed to parse AI response");
-    }
+    const cleaned = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const parsed = JSON.parse(cleaned);
 
     return new Response(JSON.stringify(parsed), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

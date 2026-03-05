@@ -6,14 +6,21 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { motion } from 'framer-motion';
-import { Loader2, Volume2, BookMarked, RefreshCw, Cpu, FlaskConical, Trophy, Palette } from 'lucide-react';
+import { Loader2, Volume2, RefreshCw, Cpu, FlaskConical, Trophy, Palette, Heart, Briefcase, Plane, Landmark, Leaf, UtensilsCrossed } from 'lucide-react';
 import WordTooltip from '@/components/WordTooltip';
+import ArticleQuiz from '@/components/ArticleQuiz';
 
 const categories = [
   { id: 'technology', label: 'تكنولوجيا', icon: Cpu, color: 'text-primary' },
-  { id: 'science', label: 'علوم', icon: FlaskConical, color: 'text-success' },
-  { id: 'sport', label: 'رياضة', icon: Trophy, color: 'text-accent' },
-  { id: 'culture', label: 'ثقافة', icon: Palette, color: 'text-destructive' },
+  { id: 'science', label: 'علوم', icon: FlaskConical, color: 'text-green-500' },
+  { id: 'sport', label: 'رياضة', icon: Trophy, color: 'text-yellow-500' },
+  { id: 'culture', label: 'ثقافة', icon: Palette, color: 'text-purple-500' },
+  { id: 'health', label: 'صحة', icon: Heart, color: 'text-red-500' },
+  { id: 'business', label: 'أعمال', icon: Briefcase, color: 'text-blue-500' },
+  { id: 'travel', label: 'سفر', icon: Plane, color: 'text-cyan-500' },
+  { id: 'history', label: 'تاريخ', icon: Landmark, color: 'text-amber-600' },
+  { id: 'environment', label: 'بيئة', icon: Leaf, color: 'text-emerald-500' },
+  { id: 'food', label: 'طعام', icon: UtensilsCrossed, color: 'text-orange-500' },
 ];
 
 interface ArticleData {
@@ -31,6 +38,7 @@ const Articles = () => {
   const [loading, setLoading] = useState(false);
   const [savedWords, setSavedWords] = useState<string[]>([]);
   const [profile, setProfile] = useState<any>(null);
+  const [isRead, setIsRead] = useState(false);
 
   const loadProfile = async () => {
     if (!user) return null;
@@ -43,6 +51,7 @@ const Articles = () => {
     setSelectedCategory(category);
     setLoading(true);
     setArticle(null);
+    setIsRead(false);
     try {
       let prof = profile;
       if (!prof) prof = await loadProfile();
@@ -56,7 +65,6 @@ const Articles = () => {
 
       setArticle(data);
 
-      // Save to DB
       const { data: saved } = await supabase.from('articles').insert({
         user_id: user!.id,
         title: data.title,
@@ -68,7 +76,6 @@ const Articles = () => {
 
       if (saved) setArticleId(saved.id);
 
-      // Load saved words for highlighting
       const { data: dict } = await supabase.from('dictionary').select('word').eq('user_id', user!.id);
       if (dict) setSavedWords(dict.map((d: any) => d.word.toLowerCase()));
     } catch (e: any) {
@@ -92,8 +99,8 @@ const Articles = () => {
   const markAsRead = async () => {
     if (!articleId || !user) return;
     await supabase.from('articles').update({ is_read: true }).eq('id', articleId);
+    setIsRead(true);
 
-    // Update progress
     const today = new Date().toISOString().split('T')[0];
     const { data: existing } = await supabase
       .from('daily_progress')
@@ -112,7 +119,6 @@ const Articles = () => {
       });
     }
 
-    // Update XP
     const { data: profData } = await supabase.from('profiles').select('xp').eq('user_id', user.id).single();
     if (profData) {
       await supabase.from('profiles').update({ xp: (profData as any).xp + 10 }).eq('user_id', user.id);
@@ -127,23 +133,21 @@ const Articles = () => {
         <h1 className="text-3xl font-bold">المقالات 📖</h1>
         <p className="text-muted-foreground">اختر مجالاً وسنولّد لك مقالاً يناسب مستواك</p>
 
-        {/* Categories */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
           {categories.map(({ id, label, icon: Icon, color }) => (
             <Button
               key={id}
               variant={selectedCategory === id ? 'default' : 'outline'}
-              className="h-auto py-4 flex-col gap-2"
+              className="h-auto py-3 flex-col gap-1.5 text-sm"
               onClick={() => generateArticle(id)}
               disabled={loading}
             >
-              <Icon className={`h-6 w-6 ${selectedCategory === id ? '' : color}`} />
+              <Icon className={`h-5 w-5 ${selectedCategory === id ? '' : color}`} />
               <span>{label}</span>
             </Button>
           ))}
         </div>
 
-        {/* Loading */}
         {loading && (
           <div className="flex items-center justify-center py-20">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -151,7 +155,6 @@ const Articles = () => {
           </div>
         )}
 
-        {/* Article */}
         {article && !loading && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <Card className="glass-card">
@@ -167,7 +170,6 @@ const Articles = () => {
                     </Button>
                   </div>
                 </div>
-                {/* Keywords */}
                 <div className="flex flex-wrap gap-2 mt-2" dir="ltr">
                   {article.key_words.map((kw) => (
                     <span key={kw} className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full font-mono">
@@ -205,14 +207,23 @@ const Articles = () => {
                 </div>
 
                 <div className="flex gap-3 mt-8 justify-end" dir="rtl">
-                  <Button onClick={markAsRead}>
-                    أنهيت القراءة ✅
-                  </Button>
+                  {!isRead && (
+                    <Button onClick={markAsRead}>أنهيت القراءة ✅</Button>
+                  )}
                   <Button variant="outline" onClick={() => speakText(article.content)}>
                     <Volume2 className="h-4 w-4 ml-2" />
                     استمع للمقال
                   </Button>
                 </div>
+
+                {/* Quiz section */}
+                {isRead && (
+                  <ArticleQuiz
+                    title={article.title}
+                    content={article.content}
+                    onComplete={(xp) => {}}
+                  />
+                )}
               </CardContent>
             </Card>
           </motion.div>
