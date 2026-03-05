@@ -2,13 +2,14 @@ import { ReactNode, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { BookOpen, LayoutDashboard, BookMarked, TrendingUp, Settings, LogOut, Menu, X, Sparkles, Sun, Moon } from 'lucide-react';
+import { BookOpen, LayoutDashboard, BookMarked, TrendingUp, LogOut, Menu, X, Sparkles, Sun, Moon, Layers } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const navItems = [
   { path: '/dashboard', icon: LayoutDashboard, label: 'الرئيسية' },
   { path: '/articles', icon: BookOpen, label: 'المقالات' },
   { path: '/dictionary', icon: BookMarked, label: 'القاموس' },
+  { path: '/flashcards', icon: Layers, label: 'بطاقات' },
   { path: '/progress', icon: TrendingUp, label: 'التقدم' },
 ];
 

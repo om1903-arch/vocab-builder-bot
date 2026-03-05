@@ -82,7 +82,11 @@ export type Database = {
           article_id: string | null
           context: string | null
           created_at: string
+          ease_factor: number | null
           id: string
+          interval_days: number | null
+          next_review: string | null
+          review_count: number | null
           translation: string
           user_id: string
           word: string
@@ -92,7 +96,11 @@ export type Database = {
           article_id?: string | null
           context?: string | null
           created_at?: string
+          ease_factor?: number | null
           id?: string
+          interval_days?: number | null
+          next_review?: string | null
+          review_count?: number | null
           translation: string
           user_id: string
           word: string
@@ -102,7 +110,11 @@ export type Database = {
           article_id?: string | null
           context?: string | null
           created_at?: string
+          ease_factor?: number | null
           id?: string
+          interval_days?: number | null
+          next_review?: string | null
+          review_count?: number | null
           translation?: string
           user_id?: string
           word?: string
