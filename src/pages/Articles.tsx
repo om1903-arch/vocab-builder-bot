@@ -1,13 +1,15 @@
-import { useState, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { motion } from 'framer-motion';
-import { Loader2, Volume2, RefreshCw, Cpu, FlaskConical, Trophy, Palette, Heart, Briefcase, Plane, Landmark, Leaf, UtensilsCrossed } from 'lucide-react';
+import { Loader2, Volume2, RefreshCw, Cpu, FlaskConical, Trophy, Palette, Heart, Briefcase, Plane, Landmark, Leaf, UtensilsCrossed, BookOpen as BookOpenIcon } from 'lucide-react';
 import WordTooltip from '@/components/WordTooltip';
+import GrammarTip from '@/components/GrammarTip';
 import ArticleQuiz from '@/components/ArticleQuiz';
 
 const categories = [
@@ -23,6 +25,15 @@ const categories = [
   { id: 'food', label: 'طعام', icon: UtensilsCrossed, color: 'text-orange-500' },
 ];
 
+const levels = [
+  { id: 'beginner', label: 'A1 - مبتدئ' },
+  { id: 'elementary', label: 'A2 - أساسي' },
+  { id: 'intermediate', label: 'B1 - متوسط' },
+  { id: 'upper_intermediate', label: 'B2 - فوق المتوسط' },
+  { id: 'advanced', label: 'C1 - متقدم' },
+  { id: 'proficient', label: 'C2 - احترافي' },
+];
+
 interface ArticleData {
   title: string;
   content: string;
@@ -33,17 +44,24 @@ const Articles = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedLevel, setSelectedLevel] = useState<string>('');
   const [article, setArticle] = useState<ArticleData | null>(null);
   const [articleId, setArticleId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [savedWords, setSavedWords] = useState<string[]>([]);
   const [profile, setProfile] = useState<any>(null);
   const [isRead, setIsRead] = useState(false);
+  const [selectedText, setSelectedText] = useState('');
+
+  useEffect(() => {
+    if (user) loadProfile();
+  }, [user]);
 
   const loadProfile = async () => {
     if (!user) return null;
     const { data } = await supabase.from('profiles').select('level').eq('user_id', user.id).single();
     setProfile(data);
+    if (data && !selectedLevel) setSelectedLevel(data.level);
     return data;
   };
 
@@ -53,11 +71,10 @@ const Articles = () => {
     setArticle(null);
     setIsRead(false);
     try {
-      let prof = profile;
-      if (!prof) prof = await loadProfile();
+      const level = selectedLevel || profile?.level || 'intermediate';
 
       const { data, error } = await supabase.functions.invoke('generate-article', {
-        body: { category, level: prof?.level || 'intermediate' },
+        body: { category, level },
       });
 
       if (error) throw error;
@@ -70,7 +87,7 @@ const Articles = () => {
         title: data.title,
         content: data.content,
         category,
-        level: prof?.level || 'intermediate',
+        level,
         key_words: data.key_words,
       }).select('id').single();
 
@@ -94,6 +111,17 @@ const Articles = () => {
 
   const onWordSaved = (word: string) => {
     setSavedWords(prev => [...prev, word.toLowerCase()]);
+  };
+
+  const handleTextSelection = () => {
+    const selection = window.getSelection();
+    if (selection && selection.toString().trim().length > 1) {
+      const text = selection.toString().trim();
+      // Only set if it contains spaces (phrase/sentence)
+      if (text.includes(' ')) {
+        setSelectedText(text);
+      }
+    }
   };
 
   const markAsRead = async () => {
@@ -131,7 +159,22 @@ const Articles = () => {
     <Layout>
       <div className="space-y-6">
         <h1 className="text-3xl font-bold">المقالات 📖</h1>
-        <p className="text-muted-foreground">اختر مجالاً وسنولّد لك مقالاً يناسب مستواك</p>
+        <p className="text-muted-foreground">اختر مجالاً ومستوى وسنولّد لك مقالاً مخصصاً</p>
+
+        {/* Level selector */}
+        <div className="flex items-center gap-3" dir="rtl">
+          <span className="text-sm font-medium">المستوى:</span>
+          <Select value={selectedLevel} onValueChange={setSelectedLevel}>
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="اختر المستوى" />
+            </SelectTrigger>
+            <SelectContent>
+              {levels.map(l => (
+                <SelectItem key={l.id} value={l.id}>{l.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
           {categories.map(({ id, label, icon: Icon, color }) => (
@@ -179,32 +222,67 @@ const Articles = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="article-text space-y-4" dir="ltr">
+                <div className="article-text space-y-4" dir="ltr" onMouseUp={handleTextSelection}>
                   {article.content.split('\n\n').map((para, pi) => (
-                    <p key={pi}>
-                      {para.split(/(\s+)/).map((token, ti) => {
-                        const cleanWord = token.replace(/[^a-zA-Z'-]/g, '');
-                        if (!cleanWord) return <span key={ti}>{token}</span>;
-                        
-                        const isSaved = savedWords.includes(cleanWord.toLowerCase());
-                        return (
-                          <WordTooltip
-                            key={ti}
-                            word={cleanWord}
-                            sentence={para}
-                            articleId={articleId}
-                            isSaved={isSaved}
-                            onSaved={onWordSaved}
-                          >
-                            <span className={`word-highlight ${isSaved ? 'word-saved' : ''}`}>
-                              {token}
-                            </span>
-                          </WordTooltip>
-                        );
-                      })}
-                    </p>
+                    <GrammarTip key={pi} sentence={para}>
+                      <p className="cursor-help hover:bg-primary/5 rounded p-1 -m-1 transition-colors">
+                        {para.split(/(\s+)/).map((token, ti) => {
+                          const cleanWord = token.replace(/[^a-zA-Z'-]/g, '');
+                          if (!cleanWord) return <span key={ti}>{token}</span>;
+                          
+                          const isSaved = savedWords.includes(cleanWord.toLowerCase());
+                          return (
+                            <WordTooltip
+                              key={ti}
+                              word={cleanWord}
+                              sentence={para}
+                              articleId={articleId}
+                              isSaved={isSaved}
+                              onSaved={onWordSaved}
+                            >
+                              <span 
+                                className={`word-highlight ${isSaved ? 'word-saved' : ''}`}
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                {token}
+                              </span>
+                            </WordTooltip>
+                          );
+                        })}
+                      </p>
+                    </GrammarTip>
                   ))}
                 </div>
+
+                {/* Selected text translation */}
+                {selectedText && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mt-4"
+                  >
+                    <Card className="border-accent/30 bg-accent/5">
+                      <CardContent className="py-3 flex items-center justify-between" dir="rtl">
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                          <BookOpenIcon className="h-4 w-4 text-accent shrink-0" />
+                          <span className="text-sm truncate article-text" dir="ltr">"{selectedText}"</span>
+                        </div>
+                        <div className="flex gap-2 shrink-0">
+                          <WordTooltip
+                            word={selectedText}
+                            sentence={selectedText}
+                            articleId={articleId}
+                            isSaved={false}
+                            onSaved={onWordSaved}
+                          >
+                            <Button size="sm" variant="outline">ترجم الجملة</Button>
+                          </WordTooltip>
+                          <Button size="sm" variant="ghost" onClick={() => setSelectedText('')}>✕</Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                )}
 
                 <div className="flex gap-3 mt-8 justify-end" dir="rtl">
                   {!isRead && (
@@ -216,7 +294,6 @@ const Articles = () => {
                   </Button>
                 </div>
 
-                {/* Quiz section */}
                 {isRead && (
                   <ArticleQuiz
                     title={article.title}

@@ -27,6 +27,28 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
+    const isPhrase = word.includes(" ");
+    const promptContent = isPhrase
+      ? `Translate this English phrase/sentence into Arabic: "${word}"
+Context: "${sentence}"
+
+Return ONLY valid JSON:
+{
+  "translation": "Arabic translation",
+  "word_type": "phrase/sentence/idiom",
+  "example": "A simple example using a similar structure",
+  "pronunciation": "Phonetic pronunciation guide for the phrase"
+}`
+      : `Translate the English word "${word}" as used in this sentence: "${sentence}"
+
+Return ONLY valid JSON:
+{
+  "translation": "Arabic translation of the word in this context",
+  "word_type": "noun/verb/adjective/adverb/preposition/conjunction/other",
+  "example": "A simple example sentence using this word",
+  "pronunciation": "Simple phonetic pronunciation guide"
+}`;
+
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -38,20 +60,9 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: "You are an English-Arabic translation assistant for language learners. Always respond with valid JSON only.",
+            content: "You are an English-Arabic translation assistant for language learners. You can translate both individual words and phrases/sentences. Always respond with valid JSON only.",
           },
-          {
-            role: "user",
-            content: `Translate the English word "${word}" as used in this sentence: "${sentence}"
-
-Return ONLY valid JSON:
-{
-  "translation": "Arabic translation of the word in this context",
-  "word_type": "noun/verb/adjective/adverb/preposition/conjunction/other",
-  "example": "A simple example sentence using this word",
-  "pronunciation": "Simple phonetic pronunciation guide"
-}`,
-          },
+          { role: "user", content: promptContent },
         ],
         temperature: 0.3,
       }),

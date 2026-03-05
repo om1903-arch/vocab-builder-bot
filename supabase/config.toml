@@ -11,3 +11,9 @@ verify_jwt = false
 
 [functions.generate-quiz]
 verify_jwt = false
+
+[functions.grammar-tips]
+verify_jwt = false
+
+[functions.generate-word-quiz]
+verify_jwt = false

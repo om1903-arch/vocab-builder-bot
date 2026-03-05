@@ -12,6 +12,7 @@ const levelDescriptions: Record<string, string> = {
   intermediate: "B1 level, moderate vocabulary, varied tenses, compound sentences",
   upper_intermediate: "B2 level, rich vocabulary, complex sentences, idiomatic expressions",
   advanced: "C1 level, sophisticated vocabulary, nuanced arguments, academic style",
+  proficient: "C2 level, near-native fluency, highly complex vocabulary, abstract concepts, literary and academic register",
 };
 
 const categoryNames: Record<string, string> = {
