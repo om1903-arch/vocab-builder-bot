@@ -14,7 +14,149 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      articles: {
+        Row: {
+          category: string
+          content: string
+          created_at: string
+          id: string
+          is_read: boolean
+          key_words: Json | null
+          level: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          content: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          key_words?: Json | null
+          level: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          content?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          key_words?: Json | null
+          level?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      daily_progress: {
+        Row: {
+          articles_read: number
+          date: string
+          id: string
+          user_id: string
+          words_saved: number
+          xp_earned: number
+        }
+        Insert: {
+          articles_read?: number
+          date?: string
+          id?: string
+          user_id: string
+          words_saved?: number
+          xp_earned?: number
+        }
+        Update: {
+          articles_read?: number
+          date?: string
+          id?: string
+          user_id?: string
+          words_saved?: number
+          xp_earned?: number
+        }
+        Relationships: []
+      }
+      dictionary: {
+        Row: {
+          article_id: string | null
+          context: string | null
+          created_at: string
+          id: string
+          translation: string
+          user_id: string
+          word: string
+          word_type: string | null
+        }
+        Insert: {
+          article_id?: string | null
+          context?: string | null
+          created_at?: string
+          id?: string
+          translation: string
+          user_id: string
+          word: string
+          word_type?: string | null
+        }
+        Update: {
+          article_id?: string | null
+          context?: string | null
+          created_at?: string
+          id?: string
+          translation?: string
+          user_id?: string
+          word?: string
+          word_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dictionary_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          daily_goal_articles: number
+          daily_goal_words: number
+          display_name: string | null
+          id: string
+          last_active: string | null
+          level: string
+          streak: number
+          user_id: string
+          xp: number
+        }
+        Insert: {
+          created_at?: string
+          daily_goal_articles?: number
+          daily_goal_words?: number
+          display_name?: string | null
+          id?: string
+          last_active?: string | null
+          level?: string
+          streak?: number
+          user_id: string
+          xp?: number
+        }
+        Update: {
+          created_at?: string
+          daily_goal_articles?: number
+          daily_goal_words?: number
+          display_name?: string | null
+          id?: string
+          last_active?: string | null
+          level?: string
+          streak?: number
+          user_id?: string
+          xp?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
