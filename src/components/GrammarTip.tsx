@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useCallback, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useToast } from '@/hooks/use-toast';
@@ -13,7 +13,7 @@ interface GrammarData {
 
 interface GrammarTipProps {
   sentence: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 const GrammarTip = ({ sentence, children }: GrammarTipProps) => {
@@ -21,6 +21,8 @@ const GrammarTip = ({ sentence, children }: GrammarTipProps) => {
   const [data, setData] = useState<GrammarData | null>(null);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const preventClick = useRef(false);
 
   const loadGrammar = async () => {
     if (data) return;
@@ -39,9 +41,50 @@ const GrammarTip = ({ sentence, children }: GrammarTipProps) => {
     }
   };
 
+  const openTip = useCallback(() => {
+    setOpen(true);
+    loadGrammar();
+  }, [data]);
+
+  const handlePointerDown = useCallback(() => {
+    preventClick.current = false;
+    longPressTimer.current = setTimeout(() => {
+      preventClick.current = true;
+      openTip();
+    }, 600); // 600ms long press
+  }, [openTip]);
+
+  const handlePointerUp = useCallback(() => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+  }, []);
+
+  const handleDoubleClick = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    openTip();
+  }, [openTip]);
+
   return (
-    <Popover open={open} onOpenChange={(o) => { setOpen(o); if (o) loadGrammar(); }}>
-      <PopoverTrigger asChild>{children}</PopoverTrigger>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <div
+          onPointerDown={handlePointerDown}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
+          onDoubleClick={handleDoubleClick}
+          onClick={(e) => {
+            // Prevent popover from opening on single click
+            if (!preventClick.current) {
+              e.preventDefault();
+              e.stopPropagation();
+            }
+          }}
+        >
+          {children}
+        </div>
+      </PopoverTrigger>
       <PopoverContent className="w-80 p-0" dir="rtl" side="top">
         {loading ? (
           <div className="flex items-center justify-center p-6">
