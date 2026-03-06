@@ -7,10 +7,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { motion } from 'framer-motion';
-import { Loader2, Volume2, RefreshCw, Cpu, FlaskConical, Trophy, Palette, Heart, Briefcase, Plane, Landmark, Leaf, UtensilsCrossed, BookOpen as BookOpenIcon } from 'lucide-react';
+import { Loader2, RefreshCw, Cpu, FlaskConical, Trophy, Palette, Heart, Briefcase, Plane, Landmark, Leaf, UtensilsCrossed, BookOpen as BookOpenIcon } from 'lucide-react';
 import WordTooltip from '@/components/WordTooltip';
 import GrammarTip from '@/components/GrammarTip';
 import ArticleQuiz from '@/components/ArticleQuiz';
+import AudioPlayer from '@/components/AudioPlayer';
 
 const categories = [
   { id: 'technology', label: 'تكنولوجيا', icon: Cpu, color: 'text-primary' },
@@ -102,12 +103,7 @@ const Articles = () => {
     }
   };
 
-  const speakText = (text: string) => {
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'en-US';
-    utterance.rate = 0.85;
-    speechSynthesis.speak(utterance);
-  };
+  // speakText removed - using AudioPlayer component instead
 
   const onWordSaved = (word: string) => {
     setSavedWords(prev => [...prev, word.toLowerCase()]);
@@ -204,10 +200,8 @@ const Articles = () => {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="article-text text-2xl">{article.title}</CardTitle>
-                  <div className="flex gap-2">
-                    <Button variant="ghost" size="icon" onClick={() => speakText(article.title + '. ' + article.content)}>
-                      <Volume2 className="h-5 w-5" />
-                    </Button>
+                  <div className="flex gap-2 items-center">
+                    <AudioPlayer text={article.title} compact />
                     <Button variant="ghost" size="icon" onClick={() => selectedCategory && generateArticle(selectedCategory)}>
                       <RefreshCw className="h-5 w-5" />
                     </Button>
@@ -284,14 +278,11 @@ const Articles = () => {
                   </motion.div>
                 )}
 
-                <div className="flex gap-3 mt-8 justify-end" dir="rtl">
+                <div className="flex gap-3 mt-8 justify-end items-center flex-wrap" dir="rtl">
                   {!isRead && (
                     <Button onClick={markAsRead}>أنهيت القراءة ✅</Button>
                   )}
-                  <Button variant="outline" onClick={() => speakText(article.content)}>
-                    <Volume2 className="h-4 w-4 ml-2" />
-                    استمع للمقال
-                  </Button>
+                  <AudioPlayer text={article.content} label="استمع للمقال" />
                 </div>
 
                 {isRead && (
