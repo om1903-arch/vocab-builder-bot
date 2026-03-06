@@ -132,4 +132,10 @@
     background-color: hsl(35 95% 55% / 0.2);
     border-bottom: 2px solid hsl(35 95% 55%);
   }
+  .word-spoken {
+    background-color: hsl(var(--primary) / 0.25);
+    border-radius: 3px;
+    box-shadow: 0 0 0 2px hsl(var(--primary) / 0.15);
+    transition: background-color 0.15s ease;
+  }
 }

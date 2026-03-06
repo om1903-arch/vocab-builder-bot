@@ -53,6 +53,8 @@ const Articles = () => {
   const [profile, setProfile] = useState<any>(null);
   const [isRead, setIsRead] = useState(false);
   const [selectedText, setSelectedText] = useState('');
+  const [spokenCharIndex, setSpokenCharIndex] = useState(-1);
+  const [isArticlePlaying, setIsArticlePlaying] = useState(false);
 
   useEffect(() => {
     if (user) loadProfile();
@@ -217,35 +219,55 @@ const Articles = () => {
               </CardHeader>
               <CardContent>
                 <div className="article-text space-y-4" dir="ltr" onMouseUp={handleTextSelection}>
-                  {article.content.split('\n\n').map((para, pi) => (
-                    <GrammarTip key={pi} sentence={para}>
-                      <p className="cursor-help hover:bg-primary/5 rounded p-1 -m-1 transition-colors">
-                        {para.split(/(\s+)/).map((token, ti) => {
-                          const cleanWord = token.replace(/[^a-zA-Z'-]/g, '');
-                          if (!cleanWord) return <span key={ti}>{token}</span>;
-                          
-                          const isSaved = savedWords.includes(cleanWord.toLowerCase());
-                          return (
-                            <WordTooltip
-                              key={ti}
-                              word={cleanWord}
-                              sentence={para}
-                              articleId={articleId}
-                              isSaved={isSaved}
-                              onSaved={onWordSaved}
-                            >
-                              <span 
-                                className={`word-highlight ${isSaved ? 'word-saved' : ''}`}
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                {token}
-                              </span>
-                            </WordTooltip>
-                          );
-                        })}
-                      </p>
-                    </GrammarTip>
-                  ))}
+                  {(() => {
+                    // Build a flat char-offset map for highlighting
+                    const paragraphs = article.content.split('\n\n');
+                    let globalOffset = 0;
+                    
+                    return paragraphs.map((para, pi) => {
+                      const paraStart = globalOffset;
+                      const tokens = para.split(/(\s+)/);
+                      
+                      const rendered = (
+                        <GrammarTip key={pi} sentence={para}>
+                          <p className="cursor-help hover:bg-primary/5 rounded p-1 -m-1 transition-colors">
+                            {tokens.map((token, ti) => {
+                              let tokenOffset = 0;
+                              for (let k = 0; k < ti; k++) tokenOffset += tokens[k].length;
+                              const tokenStart = paraStart + tokenOffset;
+                              const tokenEnd = tokenStart + token.length;
+                              const isSpoken = isArticlePlaying && spokenCharIndex >= 0 && spokenCharIndex >= tokenStart && spokenCharIndex < tokenEnd;
+                              
+                              const cleanWord = token.replace(/[^a-zA-Z'-]/g, '');
+                              if (!cleanWord) return <span key={ti}>{token}</span>;
+                              
+                              const isSaved = savedWords.includes(cleanWord.toLowerCase());
+                              return (
+                                <WordTooltip
+                                  key={ti}
+                                  word={cleanWord}
+                                  sentence={para}
+                                  articleId={articleId}
+                                  isSaved={isSaved}
+                                  onSaved={onWordSaved}
+                                >
+                                  <span 
+                                    className={`word-highlight ${isSaved ? 'word-saved' : ''} ${isSpoken ? 'word-spoken' : ''}`}
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    {token}
+                                  </span>
+                                </WordTooltip>
+                              );
+                            })}
+                          </p>
+                        </GrammarTip>
+                      );
+                      
+                      globalOffset += para.length + 2; // +2 for \n\n
+                      return rendered;
+                    });
+                  })()}
                 </div>
 
                 {/* Selected text translation */}
@@ -282,7 +304,7 @@ const Articles = () => {
                   {!isRead && (
                     <Button onClick={markAsRead}>أنهيت القراءة ✅</Button>
                   )}
-                  <AudioPlayer text={article.content} label="استمع للمقال" />
+                  <AudioPlayer text={article.content} label="استمع للمقال" onCharIndex={setSpokenCharIndex} onPlayStateChange={setIsArticlePlaying} />
                 </div>
 
                 {isRead && (
