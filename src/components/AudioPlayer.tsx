@@ -13,6 +13,7 @@ interface AudioPlayerProps {
 
 const AudioPlayer = ({ text, label, compact = false, onCharIndex, onPlayStateChange }: AudioPlayerProps) => {
   const [status, setStatus] = useState<'idle' | 'loading' | 'playing' | 'paused'>('idle');
+  const [speed, setSpeed] = useState(0.85);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const usingWebSpeech = useRef(false);
