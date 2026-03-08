@@ -23,7 +23,7 @@ interface ArticleQuizProps {
   onComplete: (xp: number) => void;
 }
 
-const ArticleQuiz = ({ title, content, onComplete }: ArticleQuizProps) => {
+const ArticleQuiz = ({ title, content, difficulty = 'normal', keyWords, onComplete }: ArticleQuizProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
