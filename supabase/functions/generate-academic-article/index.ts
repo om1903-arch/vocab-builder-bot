@@ -34,7 +34,7 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: "Invalid token" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    const { faculty_id, level, topic } = await req.json();
+    const { faculty_id, level, topic, department, subject, pdf_terms } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
@@ -51,7 +51,13 @@ serve(async (req) => {
 
     const levelDesc = levelDescriptions[level] || levelDescriptions.intermediate;
     const keyTopics = faculty.key_topics?.join(", ") || "";
-    const topicContext = topic ? `Focus specifically on: ${topic}.` : "";
+    
+    let topicContext = topic ? `Focus specifically on: ${topic}.` : "";
+    if (department) topicContext += `\nDepartment: ${department}`;
+    if (subject) topicContext += `\nSubject: ${subject}`;
+    if (pdf_terms && pdf_terms.length > 0) {
+      topicContext += `\nCRITICAL: Incorporate these terms extracted from the student's curriculum PDF: ${pdf_terms.join(", ")}`;
+    }
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -78,17 +84,17 @@ Requirements:
 1. Use formal academic register throughout
 2. Include field-specific terminology naturally in context
 3. Structure with clear introduction, body paragraphs, and conclusion
-4. Make content educational and relevant to ${faculty.name_en} studies
-5. Include 8-12 key academic terms the student should learn
+4. Make content educational and highly relevant to ${faculty.name_en} studies, specifically the subject provided.
+5. Include 10-15 key academic terms the student should learn
 
 Return ONLY valid JSON with this structure:
 {
   "title": "Academic article title in English",
-  "content": "The full article text, 300-500 words. Use paragraphs separated by \\n\\n. Include proper academic structure.",
-  "key_words": ["term1", "term2", "term3", "term4", "term5", "term6", "term7", "term8"]
+  "content": "The full article text, 600-800 words. Use paragraphs separated by \\n\\n. Go into depth academically.",
+  "key_words": ["term1", "term2", "term3", "term4", "term5", "term6", "term7", "term8", "term9", "term10"]
 }
 
-The key_words should be 8-12 important academic/field-specific vocabulary words from the article.`,
+The key_words should be 10-15 important academic/field-specific vocabulary words from the article.`,
           },
         ],
         temperature: 0.7,

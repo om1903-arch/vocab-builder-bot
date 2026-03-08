@@ -26,3 +26,6 @@ verify_jwt = false
 
 [functions.generate-academic-quiz]
 verify_jwt = false
+
+[functions.extract-pdf-terms]
+verify_jwt = false
