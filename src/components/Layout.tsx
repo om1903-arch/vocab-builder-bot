@@ -9,6 +9,7 @@ const navItems = [
   { path: '/dashboard', icon: LayoutDashboard, label: 'الرئيسية' },
   { path: '/articles', icon: BookOpen, label: 'المقالات' },
   { path: '/academic', icon: GraduationCap, label: 'أكاديمي' },
+  { path: '/academic/stats', icon: BarChart, label: 'إحصائياتي' },
   { path: '/dictionary', icon: BookMarked, label: 'القاموس' },
   { path: '/flashcards', icon: Layers, label: 'بطاقات' },
   { path: '/achievements', icon: Trophy, label: 'الإنجازات' },
