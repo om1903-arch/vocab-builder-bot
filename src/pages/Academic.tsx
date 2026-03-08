@@ -162,7 +162,7 @@ const AcademicPage = () => {
           .select('*');
           
         if (facultiesError) throw facultiesError;
-        setFaculties(facultiesData as Faculty[]);
+        setFaculties(facultiesData as unknown as Faculty[]);
         
         const { data: profileData } = await supabase
           .from('profiles')
