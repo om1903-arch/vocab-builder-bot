@@ -20,6 +20,7 @@ export type Database = {
           content: string
           created_at: string
           id: string
+          is_academic: boolean
           is_read: boolean
           key_words: Json | null
           level: string
@@ -31,6 +32,7 @@ export type Database = {
           content: string
           created_at?: string
           id?: string
+          is_academic?: boolean
           is_read?: boolean
           key_words?: Json | null
           level: string
@@ -42,6 +44,7 @@ export type Database = {
           content?: string
           created_at?: string
           id?: string
+          is_academic?: boolean
           is_read?: boolean
           key_words?: Json | null
           level?: string
@@ -130,12 +133,43 @@ export type Database = {
           },
         ]
       }
+      faculties: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          key_topics: string[]
+          name_ar: string
+          name_en: string
+          stage: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          key_topics?: string[]
+          name_ar: string
+          name_en: string
+          stage: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          key_topics?: string[]
+          name_ar?: string
+          name_en?: string
+          stage?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
           daily_goal_articles: number
           daily_goal_words: number
           display_name: string | null
+          faculty_id: string | null
           id: string
           last_active: string | null
           level: string
@@ -148,6 +182,7 @@ export type Database = {
           daily_goal_articles?: number
           daily_goal_words?: number
           display_name?: string | null
+          faculty_id?: string | null
           id?: string
           last_active?: string | null
           level?: string
@@ -160,6 +195,7 @@ export type Database = {
           daily_goal_articles?: number
           daily_goal_words?: number
           display_name?: string | null
+          faculty_id?: string | null
           id?: string
           last_active?: string | null
           level?: string
@@ -167,7 +203,15 @@ export type Database = {
           user_id?: string
           xp?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_faculty_id_fkey"
+            columns: ["faculty_id"]
+            isOneToOne: false
+            referencedRelation: "faculties"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_achievements: {
         Row: {

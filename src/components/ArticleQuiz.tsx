@@ -12,15 +12,18 @@ interface QuizQuestion {
   question: string;
   options: string[];
   correct: number;
+  type?: string;
 }
 
 interface ArticleQuizProps {
   title: string;
   content: string;
+  difficulty?: 'normal' | 'hard';
+  keyWords?: string[];
   onComplete: (xp: number) => void;
 }
 
-const ArticleQuiz = ({ title, content, onComplete }: ArticleQuizProps) => {
+const ArticleQuiz = ({ title, content, difficulty = 'normal', keyWords, onComplete }: ArticleQuizProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
@@ -35,8 +38,9 @@ const ArticleQuiz = ({ title, content, onComplete }: ArticleQuizProps) => {
   const startQuiz = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('generate-quiz', {
-        body: { title, content },
+      const endpoint = difficulty === 'hard' ? 'generate-academic-quiz' : 'generate-quiz';
+      const { data, error } = await supabase.functions.invoke(endpoint, {
+        body: { title, content, key_words: keyWords },
       });
       if (error) throw error;
       if (data.error) throw new Error(data.error);
@@ -74,7 +78,8 @@ const ArticleQuiz = ({ title, content, onComplete }: ArticleQuizProps) => {
       if (q.correct === allAnswers[i]) score++;
     });
 
-    const xpEarned = score * 5;
+    const multiplier = difficulty === 'hard' ? 8 : 5;
+    const xpEarned = score * multiplier;
     setFinished(true);
 
     if (user) {
