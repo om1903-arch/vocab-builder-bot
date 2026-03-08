@@ -12,11 +12,14 @@ interface QuizQuestion {
   question: string;
   options: string[];
   correct: number;
+  type?: string;
 }
 
 interface ArticleQuizProps {
   title: string;
   content: string;
+  difficulty?: 'normal' | 'hard';
+  keyWords?: string[];
   onComplete: (xp: number) => void;
 }
 
