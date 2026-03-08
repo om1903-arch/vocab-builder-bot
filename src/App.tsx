@@ -13,6 +13,7 @@ import Dictionary from "./pages/Dictionary";
 import ProgressPage from "./pages/Progress";
 import Flashcards from "./pages/Flashcards";
 import AchievementsPage from "./pages/AchievementsPage";
+import AcademicPage from "./pages/Academic";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
