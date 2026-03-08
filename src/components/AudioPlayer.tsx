@@ -73,7 +73,7 @@ const AudioPlayer = ({ text, label, compact = false, onCharIndex, onPlayStateCha
     usingWebSpeech.current = true;
     const u = new SpeechSynthesisUtterance(text);
     u.lang = 'en-US';
-    u.rate = 0.82;
+    u.rate = speed;
     u.pitch = 0.95;
 
     // Try to find a calm, stable voice
