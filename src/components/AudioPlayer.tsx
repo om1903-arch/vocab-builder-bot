@@ -146,6 +146,7 @@ const AudioPlayer = ({ text, label, compact = false, onCharIndex, onPlayStateCha
       
       const audioUrl = URL.createObjectURL(blob);
       const audio = new Audio(audioUrl);
+      audio.playbackRate = speed;
       audioRef.current = audio;
 
       audio.onended = () => { stopWordTimer(); updateStatus('idle'); };
