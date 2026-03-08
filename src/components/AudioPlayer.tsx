@@ -71,7 +71,35 @@ const AudioPlayer = ({ text, label, compact = false, onCharIndex, onPlayStateCha
     usingWebSpeech.current = true;
     const u = new SpeechSynthesisUtterance(text);
     u.lang = 'en-US';
-    u.rate = 0.85;
+    u.rate = 0.82;
+    u.pitch = 0.95;
+
+    // Try to find a calm, stable voice
+    const voices = speechSynthesis.getVoices();
+    const preferredVoices = [
+      'Google UK English Female',
+      'Google US English',
+      'Samantha',           // macOS
+      'Karen',              // macOS Australian
+      'Moira',              // macOS Irish
+      'Microsoft Zira',     // Windows
+      'Microsoft Hazel',    // Windows UK
+    ];
+    
+    const selectedVoice = preferredVoices
+      .map(name => voices.find(v => v.name.includes(name)))
+      .find(v => v !== undefined);
+    
+    if (selectedVoice) {
+      u.voice = selectedVoice;
+    } else {
+      // Fallback: pick any female English voice for calmer tone
+      const femaleVoice = voices.find(v => 
+        v.lang.startsWith('en') && 
+        (v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('samantha') || v.name.toLowerCase().includes('karen'))
+      );
+      if (femaleVoice) u.voice = femaleVoice;
+    }
 
     if (onCharIndex) {
       u.onboundary = (e: SpeechSynthesisEvent) => {
