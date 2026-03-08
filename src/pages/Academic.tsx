@@ -174,7 +174,7 @@ const AcademicPage = () => {
           const faculty = facultiesData.find(f => f.id === profileData.faculty_id);
           if (faculty) {
             setSelectedStage(faculty.stage as 'high_school' | 'university');
-            setSelectedFaculty(faculty as Faculty);
+            setSelectedFaculty(faculty as unknown as Faculty);
           }
         }
         
