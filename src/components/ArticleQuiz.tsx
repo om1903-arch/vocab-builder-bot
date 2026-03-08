@@ -78,7 +78,8 @@ const ArticleQuiz = ({ title, content, difficulty = 'normal', keyWords, onComple
       if (q.correct === allAnswers[i]) score++;
     });
 
-    const xpEarned = score * 5;
+    const multiplier = difficulty === 'hard' ? 8 : 5;
+    const xpEarned = score * multiplier;
     setFinished(true);
 
     if (user) {
