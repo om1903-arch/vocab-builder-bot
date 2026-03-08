@@ -84,17 +84,17 @@ Requirements:
 1. Use formal academic register throughout
 2. Include field-specific terminology naturally in context
 3. Structure with clear introduction, body paragraphs, and conclusion
-4. Make content educational and relevant to ${faculty.name_en} studies
-5. Include 8-12 key academic terms the student should learn
+4. Make content educational and highly relevant to ${faculty.name_en} studies, specifically the subject provided.
+5. Include 10-15 key academic terms the student should learn
 
 Return ONLY valid JSON with this structure:
 {
   "title": "Academic article title in English",
-  "content": "The full article text, 300-500 words. Use paragraphs separated by \\n\\n. Include proper academic structure.",
-  "key_words": ["term1", "term2", "term3", "term4", "term5", "term6", "term7", "term8"]
+  "content": "The full article text, 600-800 words. Use paragraphs separated by \\n\\n. Go into depth academically.",
+  "key_words": ["term1", "term2", "term3", "term4", "term5", "term6", "term7", "term8", "term9", "term10"]
 }
 
-The key_words should be 8-12 important academic/field-specific vocabulary words from the article.`,
+The key_words should be 10-15 important academic/field-specific vocabulary words from the article.`,
           },
         ],
         temperature: 0.7,
