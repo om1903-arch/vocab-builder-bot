@@ -198,44 +198,60 @@ const AudioPlayer = ({ text, label, compact = false, onCharIndex, onPlayStateCha
     );
   }
 
+  const speedLabel = speed <= 0.6 ? 'بطيء جداً' : speed <= 0.8 ? 'بطيء' : speed <= 1.0 ? 'عادي' : speed <= 1.3 ? 'سريع' : 'سريع جداً';
+
   return (
-    <div className="flex items-center gap-2">
-      {status === 'idle' && (
-        <Button variant="outline" size="sm" onClick={play}>
-          <Volume2 className="h-4 w-4 ml-2" />
-          {label || 'استمع'}
-        </Button>
-      )}
-      {status === 'loading' && (
-        <Button variant="outline" size="sm" disabled>
-          <Loader2 className="h-4 w-4 ml-2 animate-spin" />
-          جاري التحميل...
-        </Button>
-      )}
-      {status === 'playing' && (
-        <>
-          <Button variant="outline" size="sm" onClick={pause}>
-            <Pause className="h-4 w-4 ml-2" />
-            إيقاف مؤقت
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center gap-2">
+        {status === 'idle' && (
+          <Button variant="outline" size="sm" onClick={play}>
+            <Volume2 className="h-4 w-4 ml-2" />
+            {label || 'استمع'}
           </Button>
-          <Button variant="destructive" size="sm" onClick={stopAll}>
-            <Square className="h-4 w-4 ml-2" />
-            إيقاف
+        )}
+        {status === 'loading' && (
+          <Button variant="outline" size="sm" disabled>
+            <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+            جاري التحميل...
           </Button>
-        </>
-      )}
-      {status === 'paused' && (
-        <>
-          <Button variant="outline" size="sm" onClick={resume}>
-            <Play className="h-4 w-4 ml-2" />
-            استئناف
-          </Button>
-          <Button variant="destructive" size="sm" onClick={stopAll}>
-            <Square className="h-4 w-4 ml-2" />
-            إيقاف
-          </Button>
-        </>
-      )}
+        )}
+        {status === 'playing' && (
+          <>
+            <Button variant="outline" size="sm" onClick={pause}>
+              <Pause className="h-4 w-4 ml-2" />
+              إيقاف مؤقت
+            </Button>
+            <Button variant="destructive" size="sm" onClick={stopAll}>
+              <Square className="h-4 w-4 ml-2" />
+              إيقاف
+            </Button>
+          </>
+        )}
+        {status === 'paused' && (
+          <>
+            <Button variant="outline" size="sm" onClick={resume}>
+              <Play className="h-4 w-4 ml-2" />
+              استئناف
+            </Button>
+            <Button variant="destructive" size="sm" onClick={stopAll}>
+              <Square className="h-4 w-4 ml-2" />
+              إيقاف
+            </Button>
+          </>
+        )}
+      </div>
+      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <Gauge className="h-3.5 w-3.5" />
+        <span className="min-w-[60px]">السرعة: {speedLabel}</span>
+        <Slider
+          value={[speed]}
+          onValueChange={([v]) => setSpeed(v)}
+          min={0.5}
+          max={1.5}
+          step={0.05}
+          className="w-28"
+        />
+      </div>
     </div>
   );
 };
