@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Volume2, Pause, Square, Play, Loader2 } from 'lucide-react';
+import { Slider } from '@/components/ui/slider';
+import { Volume2, Pause, Square, Play, Loader2, Gauge } from 'lucide-react';
 
 interface AudioPlayerProps {
   text: string;
