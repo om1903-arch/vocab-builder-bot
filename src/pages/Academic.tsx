@@ -5,11 +5,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, GraduationCap, BookOpen, Brain, Settings } from 'lucide-react';
-import WordTooltip from '@/components/WordTooltip';
-import GrammarTip from '@/components/GrammarTip';
+import { Loader2, GraduationCap, BookOpen, Brain, Settings, Volume2, BookMarked } from 'lucide-react';
 import AudioPlayer from '@/components/AudioPlayer';
 import ArticleQuiz from '@/components/ArticleQuiz';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 interface Faculty {
   id: string;
@@ -25,6 +24,96 @@ interface Article {
   key_words: string[];
 }
 
+// Inline word tooltip for academic page (simplified)
+const AcademicWordTooltip = ({ word, sentence, articleId, savedWords, onSaved }: {
+  word: string;
+  sentence: string;
+  articleId: string | null;
+  savedWords: Set<string>;
+  onSaved: (word: string) => void;
+}) => {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [data, setData] = useState<{ translation: string; word_type: string; example: string } | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const isSaved = savedWords.has(word.toLowerCase());
+
+  const loadTranslation = async () => {
+    if (data) return;
+    setLoading(true);
+    try {
+      const { data: result, error } = await supabase.functions.invoke('translate-word', {
+        body: { word, sentence },
+      });
+      if (error) throw error;
+      if (result.error) throw new Error(result.error);
+      setData(result);
+    } catch (e: any) {
+      toast({ title: 'خطأ في الترجمة', description: e.message, variant: 'destructive' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const saveWord = async () => {
+    if (!user || !data) return;
+    try {
+      await supabase.from('dictionary').insert({
+        user_id: user.id,
+        word,
+        translation: data.translation,
+        context: sentence,
+        word_type: data.word_type,
+        article_id: articleId,
+      });
+      onSaved(word);
+      toast({ title: 'تمت الإضافة 📚', description: `"${word}" أُضيفت إلى قاموسك` });
+    } catch (e: any) {
+      toast({ title: 'خطأ', description: e.message, variant: 'destructive' });
+    }
+  };
+
+  return (
+    <Popover open={open} onOpenChange={(o) => { setOpen(o); if (o) loadTranslation(); }}>
+      <PopoverTrigger asChild>
+        <span className="cursor-help hover:text-primary transition-colors">{word}</span>
+      </PopoverTrigger>
+      <PopoverContent className="w-72 p-0" dir="rtl" side="top">
+        {loading ? (
+          <div className="flex items-center justify-center p-6">
+            <Loader2 className="h-5 w-5 animate-spin text-primary" />
+          </div>
+        ) : data ? (
+          <div className="p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="font-bold text-lg" dir="ltr">{word}</span>
+                <span className="text-xs text-muted-foreground mr-2 font-mono">({data.word_type})</span>
+              </div>
+              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => {
+                const u = new SpeechSynthesisUtterance(word);
+                u.lang = 'en-US';
+                speechSynthesis.speak(u);
+              }}>
+                <Volume2 className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="text-sm font-medium">{data.translation}</div>
+            <div className="text-xs text-muted-foreground" dir="ltr">{data.example}</div>
+            {!isSaved && (
+              <Button size="sm" className="w-full" onClick={saveWord}>
+                <BookMarked className="h-4 w-4 ml-2" />
+                أضف للقاموس
+              </Button>
+            )}
+          </div>
+        ) : null}
+      </PopoverContent>
+    </Popover>
+  );
+};
+
 const AcademicPage = () => {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -38,41 +127,37 @@ const AcademicPage = () => {
   const [loadingConfig, setLoadingConfig] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [article, setArticle] = useState<Article | null>(null);
+  const [articleId, setArticleId] = useState<string | null>(null);
   const [showConfig, setShowConfig] = useState(true);
+  const [savedWords, setSavedWords] = useState<Set<string>>(new Set());
 
-  // Fetch faculties and user's saved faculty
   useEffect(() => {
     const fetchConfig = async () => {
       if (!user) return;
-      
       try {
-        // Fetch faculties
         const { data: facultiesData, error: facultiesError } = await supabase
           .from('faculties')
           .select('*');
           
         if (facultiesError) throw facultiesError;
-        setFaculties(facultiesData);
+        setFaculties(facultiesData as Faculty[]);
         
-        // Fetch user profile
-        const { data: profileData, error: profileError } = await supabase
+        const { data: profileData } = await supabase
           .from('profiles')
           .select('faculty_id, level')
           .eq('user_id', user.id)
           .single();
           
-        if (profileError && profileError.code !== 'PGRST116') throw profileError;
-        
         if (profileData?.faculty_id) {
           setSelectedFacultyId(profileData.faculty_id);
           const faculty = facultiesData.find(f => f.id === profileData.faculty_id);
-          if (faculty) setSelectedStage(faculty.stage);
+          if (faculty) setSelectedStage(faculty.stage as 'high_school' | 'university');
         }
         
         if (profileData?.level) {
           setLevel(profileData.level);
         }
-      } catch (error: any) {
+      } catch {
         toast({ title: 'خطأ', description: 'حدث خطأ أثناء تحميل البيانات', variant: 'destructive' });
       } finally {
         setLoadingConfig(false);
@@ -85,14 +170,9 @@ const AcademicPage = () => {
   const saveFaculty = async (facultyId: string) => {
     if (!user) return;
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ faculty_id: facultyId })
-        .eq('user_id', user.id);
-        
-      if (error) throw error;
+      await supabase.from('profiles').update({ faculty_id: facultyId }).eq('user_id', user.id);
       toast({ title: 'تم الحفظ', description: 'تم حفظ التخصص بنجاح' });
-    } catch (error) {
+    } catch {
       toast({ title: 'خطأ', description: 'لم يتم حفظ التخصص', variant: 'destructive' });
     }
   };
@@ -105,15 +185,13 @@ const AcademicPage = () => {
     
     setGenerating(true);
     setArticle(null);
+    setArticleId(null);
     setShowConfig(false);
+    setSavedWords(new Set());
     
     try {
       const { data, error } = await supabase.functions.invoke('generate-academic-article', {
-        body: { 
-          faculty_id: selectedFacultyId, 
-          level,
-          topic: topic.trim() || undefined
-        }
+        body: { faculty_id: selectedFacultyId, level, topic: topic.trim() || undefined }
       });
       
       if (error) throw error;
@@ -121,9 +199,8 @@ const AcademicPage = () => {
       
       setArticle(data);
       
-      // Save article to DB
       if (user) {
-        await supabase.from('articles').insert({
+        const { data: saved } = await supabase.from('articles').insert({
           user_id: user.id,
           title: data.title,
           content: data.content,
@@ -131,7 +208,9 @@ const AcademicPage = () => {
           category: 'Academic',
           key_words: data.key_words,
           is_academic: true
-        });
+        }).select('id').single();
+        
+        if (saved) setArticleId(saved.id);
       }
     } catch (error: any) {
       toast({ title: 'خطأ', description: error.message || 'حدث خطأ أثناء توليد المقال', variant: 'destructive' });
@@ -150,23 +229,26 @@ const AcademicPage = () => {
   }
 
   const renderContent = (text: string) => {
-    return text.split('\n').map((paragraph, i) => (
-      <p key={i} className="mb-4">
+    return text.split('\n\n').filter(Boolean).map((paragraph, i) => (
+      <p key={i} className="mb-4 leading-relaxed">
         {paragraph.split(' ').map((word, j) => {
-          const cleanWord = word.replace(/[.,!?()]/g, '');
-          const isKeyword = article?.key_words?.some(kw => 
-            cleanWord.toLowerCase().includes(kw.toLowerCase()) || 
-            kw.toLowerCase().includes(cleanWord.toLowerCase())
+          const cleanWord = word.replace(/[.,!?();:]/g, '');
+          const isKeyword = article?.key_words?.some(kw =>
+            cleanWord.toLowerCase() === kw.toLowerCase()
           );
           
           return (
             <span key={j}>
-              <WordTooltip word={cleanWord} context={paragraph}>
-                <span className={`hover:text-primary transition-colors cursor-help ${isKeyword ? 'font-bold text-primary underline decoration-primary/30 underline-offset-4' : ''}`}>
-                  {word}
-                </span>
-              </WordTooltip>
-              {' '}
+              <span className={isKeyword ? 'font-semibold text-primary underline decoration-primary/30 underline-offset-4' : ''}>
+                <AcademicWordTooltip
+                  word={cleanWord}
+                  sentence={paragraph}
+                  articleId={articleId}
+                  savedWords={savedWords}
+                  onSaved={(w) => setSavedWords(prev => new Set([...prev, w.toLowerCase()]))}
+                />
+              </span>
+              {word !== cleanWord ? word.slice(cleanWord.length) : ''}{' '}
             </span>
           );
         })}
@@ -190,116 +272,105 @@ const AcademicPage = () => {
         {!showConfig && article && (
           <Button variant="outline" onClick={() => setShowConfig(true)} className="gap-2">
             <Settings className="h-4 w-4" />
-            تغيير التخصص
+            تغيير الإعدادات
           </Button>
         )}
       </div>
 
       {showConfig && (
-        <Card className="border-primary/20 bg-card/50 backdrop-blur-sm">
+        <Card className="border-primary/20">
           <CardHeader>
             <CardTitle>إعدادات الدراسة</CardTitle>
             <CardDescription>اختر المرحلة والتخصص لتوليد محتوى يناسب احتياجاتك</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-3">
+              <label className="text-sm font-medium">المرحلة الدراسية</label>
+              <div className="grid grid-cols-2 gap-3">
+                <Button 
+                  variant={selectedStage === 'high_school' ? 'default' : 'outline'}
+                  onClick={() => { setSelectedStage('high_school'); setSelectedFacultyId(null); }}
+                  className="h-16 text-base"
+                >
+                  🏫 الثانوية العامة
+                </Button>
+                <Button 
+                  variant={selectedStage === 'university' ? 'default' : 'outline'}
+                  onClick={() => { setSelectedStage('university'); setSelectedFacultyId(null); }}
+                  className="h-16 text-base"
+                >
+                  🎓 المرحلة الجامعية
+                </Button>
+              </div>
+            </div>
+            
+            {selectedStage && (
               <div className="space-y-3">
-                <label className="text-sm font-medium">المرحلة الدراسية</label>
-                <div className="grid grid-cols-2 gap-3">
-                  <Button 
-                    variant={selectedStage === 'high_school' ? 'default' : 'outline'}
-                    onClick={() => {
-                      setSelectedStage('high_school');
-                      setSelectedFacultyId(null);
-                    }}
-                    className="h-16"
-                  >
-                    الثانوية العامة
-                  </Button>
-                  <Button 
-                    variant={selectedStage === 'university' ? 'default' : 'outline'}
-                    onClick={() => {
-                      setSelectedStage('university');
-                      setSelectedFacultyId(null);
-                    }}
-                    className="h-16"
-                  >
-                    المرحلة الجامعية
-                  </Button>
+                <label className="text-sm font-medium">
+                  {selectedStage === 'high_school' ? 'المسار الدراسي' : 'الكلية / التخصص'}
+                </label>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  {faculties
+                    .filter(f => f.stage === selectedStage)
+                    .map(f => (
+                      <button
+                        key={f.id}
+                        onClick={() => { setSelectedFacultyId(f.id); saveFaculty(f.id); }}
+                        className={`p-3 rounded-lg border text-sm font-medium text-right transition-all ${
+                          selectedFacultyId === f.id 
+                            ? 'bg-primary text-primary-foreground border-primary shadow-md' 
+                            : 'bg-card border-border hover:border-primary/50 hover:bg-primary/5'
+                        }`}
+                      >
+                        {f.name_ar}
+                        <span className="block text-xs opacity-70 font-normal mt-0.5">{f.name_en}</span>
+                      </button>
+                    ))}
                 </div>
               </div>
-              
-              <div className="space-y-3">
-                <label className="text-sm font-medium">التخصص</label>
-                <Select 
-                  value={selectedFacultyId || undefined} 
-                  onValueChange={(val) => {
-                    setSelectedFacultyId(val);
-                    saveFaculty(val);
-                  }}
-                  disabled={!selectedStage}
-                >
-                  <SelectTrigger className="h-16 text-lg">
-                    <SelectValue placeholder="اختر التخصص..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {faculties
-                      .filter(f => f.stage === selectedStage)
-                      .map(f => (
-                        <SelectItem key={f.id} value={f.id} className="text-base py-3">
-                          {f.name_ar} - {f.name_en}
-                        </SelectItem>
-                      ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
+            )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t">
-              <div className="space-y-3">
-                <label className="text-sm font-medium">مستوى اللغة الإنجليزية</label>
-                <Select value={level} onValueChange={setLevel}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="beginner">مبتدئ (A1-A2)</SelectItem>
-                    <SelectItem value="elementary">أساسي (A2-B1)</SelectItem>
-                    <SelectItem value="intermediate">متوسط (B1-B2)</SelectItem>
-                    <SelectItem value="upper_intermediate">فوق المتوسط (B2-C1)</SelectItem>
-                    <SelectItem value="advanced">متقدم (C1)</SelectItem>
-                    <SelectItem value="proficient">محترف (C2)</SelectItem>
-                  </SelectContent>
-                </Select>
+            {selectedFacultyId && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">مستوى اللغة</label>
+                  <Select value={level} onValueChange={setLevel}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="beginner">مبتدئ (A1-A2)</SelectItem>
+                      <SelectItem value="elementary">أساسي (A2-B1)</SelectItem>
+                      <SelectItem value="intermediate">متوسط (B1-B2)</SelectItem>
+                      <SelectItem value="upper_intermediate">فوق المتوسط (B2-C1)</SelectItem>
+                      <SelectItem value="advanced">متقدم (C1)</SelectItem>
+                      <SelectItem value="proficient">محترف (C2)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">موضوع محدد (اختياري)</label>
+                  <input 
+                    type="text" 
+                    value={topic}
+                    onChange={(e) => setTopic(e.target.value)}
+                    placeholder="مثال: الخلية النباتية، العقود..."
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  />
+                </div>
               </div>
-              
-              <div className="space-y-3">
-                <label className="text-sm font-medium">موضوع محدد (اختياري)</label>
-                <input 
-                  type="text" 
-                  value={topic}
-                  onChange={(e) => setTopic(e.target.value)}
-                  placeholder="مثال: الخلية النباتية، العقود التجارية..."
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                />
-              </div>
-            </div>
+            )}
 
             <Button 
-              className="w-full h-12 text-lg mt-4 gap-2" 
+              className="w-full h-12 text-base gap-2" 
               onClick={generateArticle}
               disabled={generating || !selectedFacultyId}
             >
               {generating ? (
-                <>
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                  جاري التوليد...
-                </>
+                <><Loader2 className="h-5 w-5 animate-spin" /> جاري التوليد...</>
               ) : (
-                <>
-                  <Brain className="h-5 w-5" />
-                  توليد مقال أكاديمي
-                </>
+                <><Brain className="h-5 w-5" /> توليد مقال أكاديمي</>
               )}
             </Button>
           </CardContent>
@@ -307,11 +378,8 @@ const AcademicPage = () => {
       )}
 
       {generating && !showConfig && (
-        <Card className="p-12 flex flex-col items-center justify-center space-y-6 glass-card">
-          <div className="relative">
-            <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full" />
-            <Brain className="h-16 w-16 text-primary animate-pulse relative z-10" />
-          </div>
+        <Card className="p-12 flex flex-col items-center justify-center space-y-4 glass-card">
+          <Brain className="h-16 w-16 text-primary animate-pulse" />
           <div className="text-center space-y-2">
             <h3 className="text-xl font-bold">جاري إعداد المحتوى الأكاديمي...</h3>
             <p className="text-muted-foreground">نقوم باختيار المصطلحات العلمية المناسبة لتخصصك</p>
@@ -324,34 +392,24 @@ const AcademicPage = () => {
         <div className="space-y-6 animate-fade-in pb-20">
           <Card className="glass-card overflow-hidden">
             <CardHeader className="bg-primary/5 border-b border-primary/10">
-              <div className="flex flex-col md:flex-row md:items-start justify-between gap-4" dir="ltr">
-                <div className="space-y-2 flex-1">
-                  <div className="flex flex-wrap items-center gap-2 mb-2" dir="rtl">
-                    <span className="px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium border border-primary/20">
-                      {faculties.find(f => f.id === selectedFacultyId)?.name_ar}
-                    </span>
-                    <span className="px-2.5 py-1 rounded-full bg-accent/10 text-accent text-xs font-medium border border-accent/20">
-                      {level}
-                    </span>
-                  </div>
-                  <CardTitle className="text-2xl md:text-3xl font-serif text-foreground leading-tight">
-                    {article.title}
-                  </CardTitle>
+              <div className="flex flex-col gap-3">
+                <div className="flex flex-wrap items-center gap-2" dir="rtl">
+                  <span className="px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium border border-primary/20">
+                    {faculties.find(f => f.id === selectedFacultyId)?.name_ar}
+                  </span>
+                  <span className="px-2.5 py-1 rounded-full bg-accent/10 text-accent-foreground text-xs font-medium border border-accent/20">
+                    أكاديمي 🎓
+                  </span>
                 </div>
-                <div className="shrink-0 flex gap-2">
+                <div className="flex items-start justify-between gap-4">
+                  <CardTitle className="text-2xl font-serif" dir="ltr">{article.title}</CardTitle>
                   <AudioPlayer text={article.content} />
                 </div>
               </div>
             </CardHeader>
             <CardContent className="pt-6">
-              <div className="prose dark:prose-invert max-w-none">
-                <div className="article-text text-lg leading-relaxed text-foreground/90 font-serif" dir="ltr">
-                  <GrammarTip text={article.content}>
-                    <div className="space-y-4">
-                      {renderContent(article.content)}
-                    </div>
-                  </GrammarTip>
-                </div>
+              <div className="article-text text-lg leading-loose font-serif" dir="ltr">
+                {renderContent(article.content)}
               </div>
             </CardContent>
           </Card>
@@ -367,11 +425,14 @@ const AcademicPage = () => {
               <CardContent>
                 <div className="flex flex-wrap gap-2" dir="ltr">
                   {article.key_words.map((kw, i) => (
-                    <WordTooltip key={i} word={kw} context={article.content}>
-                      <span className="px-3 py-1.5 rounded-md bg-background border shadow-sm text-sm font-medium cursor-help hover:border-primary/50 transition-colors">
-                        {kw}
-                      </span>
-                    </WordTooltip>
+                    <AcademicWordTooltip
+                      key={i}
+                      word={kw}
+                      sentence={article.content.split('\n')[0]}
+                      articleId={articleId}
+                      savedWords={savedWords}
+                      onSaved={(w) => setSavedWords(prev => new Set([...prev, w.toLowerCase()]))}
+                    />
                   ))}
                 </div>
               </CardContent>
@@ -383,9 +444,7 @@ const AcademicPage = () => {
             content={article.content} 
             difficulty="hard"
             keyWords={article.key_words}
-            onComplete={(xp) => {
-              console.log(`Earned ${xp} XP from academic quiz!`);
-            }} 
+            onComplete={(xp) => console.log(`+${xp} XP from academic quiz`)} 
           />
         </div>
       )}
