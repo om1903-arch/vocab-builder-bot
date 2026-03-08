@@ -142,6 +142,7 @@ export type Database = {
           name_ar: string
           name_en: string
           stage: string
+          structure: Json | null
         }
         Insert: {
           created_at?: string
@@ -151,6 +152,7 @@ export type Database = {
           name_ar: string
           name_en: string
           stage: string
+          structure?: Json | null
         }
         Update: {
           created_at?: string
@@ -160,6 +162,7 @@ export type Database = {
           name_ar?: string
           name_en?: string
           stage?: string
+          structure?: Json | null
         }
         Relationships: []
       }
