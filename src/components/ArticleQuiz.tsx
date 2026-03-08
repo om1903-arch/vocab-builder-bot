@@ -38,8 +38,9 @@ const ArticleQuiz = ({ title, content, difficulty = 'normal', keyWords, onComple
   const startQuiz = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('generate-quiz', {
-        body: { title, content },
+      const endpoint = difficulty === 'hard' ? 'generate-academic-quiz' : 'generate-quiz';
+      const { data, error } = await supabase.functions.invoke(endpoint, {
+        body: { title, content, key_words: keyWords },
       });
       if (error) throw error;
       if (data.error) throw new Error(data.error);
