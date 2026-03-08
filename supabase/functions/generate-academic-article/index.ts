@@ -51,7 +51,13 @@ serve(async (req) => {
 
     const levelDesc = levelDescriptions[level] || levelDescriptions.intermediate;
     const keyTopics = faculty.key_topics?.join(", ") || "";
-    const topicContext = topic ? `Focus specifically on: ${topic}.` : "";
+    
+    let topicContext = topic ? `Focus specifically on: ${topic}.` : "";
+    if (department) topicContext += `\nDepartment: ${department}`;
+    if (subject) topicContext += `\nSubject: ${subject}`;
+    if (pdf_terms && pdf_terms.length > 0) {
+      topicContext += `\nCRITICAL: Incorporate these terms extracted from the student's curriculum PDF: ${pdf_terms.join(", ")}`;
+    }
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
