@@ -92,6 +92,9 @@ const AudioPlayer = ({ text, label, compact = false, onCharIndex, onPlayStateCha
     stopAll();
     updateStatus('loading');
     
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000); // 5s max wait
+
     try {
       const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`;
       const response = await fetch(url, {
@@ -102,7 +105,9 @@ const AudioPlayer = ({ text, label, compact = false, onCharIndex, onPlayStateCha
           'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
         body: JSON.stringify({ text, voiceId: 'JBFqnCBsd6RMkjVDRZzb' }),
+        signal: controller.signal,
       });
+      clearTimeout(timeout);
 
       if (!response.ok) throw new Error('ElevenLabs failed');
 
@@ -122,6 +127,7 @@ const AudioPlayer = ({ text, label, compact = false, onCharIndex, onPlayStateCha
       updateStatus('playing');
       if (onCharIndex) startWordEstimation(audio);
     } catch {
+      clearTimeout(timeout);
       fallbackToWebSpeech();
     }
   }, [text, stopAll, fallbackToWebSpeech, updateStatus, onCharIndex, startWordEstimation, stopWordTimer]);
