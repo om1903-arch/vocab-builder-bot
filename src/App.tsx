@@ -14,6 +14,7 @@ import ProgressPage from "./pages/Progress";
 import Flashcards from "./pages/Flashcards";
 import AchievementsPage from "./pages/AchievementsPage";
 import AcademicPage from "./pages/Academic";
+import AcademicStats from "./pages/AcademicStats";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
