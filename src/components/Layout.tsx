@@ -57,10 +57,10 @@ const Layout = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <div className="min-h-screen flex" dir="rtl">
+    <div className="min-h-screen flex relative" dir="rtl">
       {/* Mobile menu button */}
       <button
-        className="fixed top-4 right-4 z-50 lg:hidden p-2 rounded-lg bg-card border border-border shadow-md"
+        className="fixed top-4 right-4 z-50 lg:hidden p-2 rounded-lg glass-card text-foreground"
         onClick={() => setSidebarOpen(!sidebarOpen)}
       >
         {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -70,7 +70,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
       <AnimatePresence>
         {(sidebarOpen || true) && (
           <motion.aside
-            className={`fixed lg:sticky top-0 right-0 h-screen w-64 bg-sidebar text-sidebar-foreground border-l border-sidebar-border z-40 flex flex-col transition-transform lg:translate-x-0 ${
+            className={`fixed lg:sticky top-0 right-0 h-screen w-64 glass-card border-l-0 border-r-0 border-y-0 text-sidebar-foreground z-40 flex flex-col transition-transform lg:translate-x-0 ${
               sidebarOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'
             }`}
           >
