@@ -439,6 +439,15 @@ const AcademicPage = () => {
               </div>
             )}
 
+            {selectedFaculty && (
+              <div className="flex justify-end mt-2 mb-2">
+                <Button variant="outline" size="sm" onClick={analyzeCurriculum} disabled={isAnalyzing}>
+                  {isAnalyzing ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Brain className="h-4 w-4 mr-2" />}
+                  تحليل المناهج (AI)
+                </Button>
+              </div>
+            )}
+
             {selectedFaculty && currentDepartments.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-muted/30 rounded-xl border border-border">
                 <div className="space-y-2">

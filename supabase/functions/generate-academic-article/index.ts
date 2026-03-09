@@ -55,6 +55,19 @@ serve(async (req) => {
     let topicContext = topic ? `Focus specifically on: ${topic}.` : "";
     if (department) topicContext += `\nDepartment: ${department}`;
     if (subject) topicContext += `\nSubject: ${subject}`;
+    
+    // Add curriculum analysis context if available
+    if (faculty.curriculum_analysis && department && subject) {
+      const analysis = (faculty.curriculum_analysis as any)?.[department]?.[subject];
+      if (analysis) {
+        topicContext += `\n\nCURRICULUM CONTEXT FOR ${subject}:
+Overview: ${analysis.overview || ''}
+Core Concepts: ${(analysis.core_concepts || []).join(', ')}
+Key Terminology: ${(analysis.key_terminology || []).join(', ')}
+Academic Depth: ${analysis.academic_depth || ''}`;
+      }
+    }
+
     if (pdf_terms && pdf_terms.length > 0) {
       topicContext += `\nCRITICAL: Incorporate these terms extracted from the student's curriculum PDF: ${pdf_terms.join(", ")}`;
     }
