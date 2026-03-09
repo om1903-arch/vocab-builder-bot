@@ -210,6 +210,25 @@ const AcademicPage = () => {
     saveFaculty(faculty.id);
   };
 
+  const analyzeCurriculum = async () => {
+    if (!selectedFaculty) return;
+    setIsAnalyzing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('seed-curriculum-analysis', {
+        body: { faculty_id: selectedFaculty.id }
+      });
+      if (error) throw error;
+      if (data.error) throw new Error(data.error);
+      
+      toast({ title: 'نجاح', description: 'تم تحليل وتحديث المناهج بنجاح.' });
+    } catch (err: any) {
+      console.error(err);
+      toast({ title: 'خطأ', description: err.message || 'فشل تحليل المناهج', variant: 'destructive' });
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
   const handlePdfUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
