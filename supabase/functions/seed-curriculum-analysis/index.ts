@@ -110,6 +110,10 @@ Return ONLY valid JSON with this exact structure:
 
           const data = await response.json();
           const raw = data.choices?.[0]?.message?.content;
+          if (!raw) {
+            console.error("Empty AI response for", subjectName);
+            continue;
+          }
           const cleaned = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
           const parsed = JSON.parse(cleaned);
 

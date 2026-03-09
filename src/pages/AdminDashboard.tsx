@@ -17,7 +17,7 @@ interface Faculty {
 }
 
 const AdminDashboard = () => {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const { toast } = useToast();
   const [faculties, setFaculties] = useState<Faculty[]>([]);
   const [loading, setLoading] = useState(true);
@@ -67,6 +67,16 @@ const AdminDashboard = () => {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center" dir="rtl">
+        <ShieldAlert className="h-16 w-16 text-destructive mb-4" />
+        <h1 className="text-2xl font-bold mb-2">غير مصرح</h1>
+        <p className="text-muted-foreground">ليس لديك صلاحية الوصول إلى هذه الصفحة.</p>
       </div>
     );
   }
