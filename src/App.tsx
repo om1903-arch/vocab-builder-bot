@@ -17,6 +17,7 @@ import AcademicPage from "./pages/Academic";
 import AcademicStats from "./pages/AcademicStats";
 import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/AdminDashboard";
+import Roleplay from "./pages/Roleplay";
 
 const queryClient = new QueryClient();
 
