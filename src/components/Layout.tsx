@@ -14,6 +14,7 @@ const navItems = [
   { path: '/dictionary', icon: BookMarked, label: 'القاموس' },
   { path: '/flashcards', icon: Layers, label: 'بطاقات' },
   { path: '/roleplay', icon: Mic, label: 'محاكاة' },
+  { path: '/leaderboard', icon: Trophy, label: 'لوحة الصدارة' },
   { path: '/achievements', icon: Trophy, label: 'الإنجازات' },
   { path: '/progress', icon: TrendingUp, label: 'التقدم' },
 ];
