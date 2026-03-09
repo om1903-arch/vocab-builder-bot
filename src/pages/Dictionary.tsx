@@ -285,6 +285,9 @@ const Dictionary = () => {
                             "{entry.context.substring(0, 100)}..."
                           </div>
                         )}
+                        <div className="mt-2 w-full max-w-sm">
+                           <PronunciationTester word={entry.word} />
+                        </div>
                       </div>
                       <Button variant="ghost" size="icon" className="shrink-0 text-destructive" onClick={() => deleteEntry(entry.id)}>
                         <Trash2 className="h-4 w-4" />
