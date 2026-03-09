@@ -29,3 +29,6 @@ verify_jwt = false
 
 [functions.extract-pdf-terms]
 verify_jwt = false
+
+[functions.seed-curriculum-analysis]
+verify_jwt = false

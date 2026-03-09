@@ -147,6 +147,7 @@ const AcademicPage = () => {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [extractedPdfTerms, setExtractedPdfTerms] = useState<string[]>([]);
   const [isExtractingPdf, setIsExtractingPdf] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   
   const [loadingConfig, setLoadingConfig] = useState(true);
   const [generating, setGenerating] = useState(false);
@@ -207,6 +208,25 @@ const AcademicPage = () => {
     setSelectedDeptEn('');
     setSelectedSubjectEn('');
     saveFaculty(faculty.id);
+  };
+
+  const analyzeCurriculum = async () => {
+    if (!selectedFaculty) return;
+    setIsAnalyzing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('seed-curriculum-analysis', {
+        body: { faculty_id: selectedFaculty.id }
+      });
+      if (error) throw error;
+      if (data.error) throw new Error(data.error);
+      
+      toast({ title: 'نجاح', description: 'تم تحليل وتحديث المناهج بنجاح.' });
+    } catch (err: any) {
+      console.error(err);
+      toast({ title: 'خطأ', description: err.message || 'فشل تحليل المناهج', variant: 'destructive' });
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   const handlePdfUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -416,6 +436,15 @@ const AcademicPage = () => {
                       </button>
                     ))}
                 </div>
+              </div>
+            )}
+
+            {selectedFaculty && (
+              <div className="flex justify-end mt-2 mb-2">
+                <Button variant="outline" size="sm" onClick={analyzeCurriculum} disabled={isAnalyzing}>
+                  {isAnalyzing ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Brain className="h-4 w-4 mr-2" />}
+                  تحليل المناهج (AI)
+                </Button>
               </div>
             )}
 

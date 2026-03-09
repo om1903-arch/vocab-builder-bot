@@ -136,6 +136,7 @@ export type Database = {
       faculties: {
         Row: {
           created_at: string
+          curriculum_analysis: Json | null
           description: string | null
           id: string
           key_topics: string[]
@@ -146,6 +147,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          curriculum_analysis?: Json | null
           description?: string | null
           id?: string
           key_topics?: string[]
@@ -156,6 +158,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          curriculum_analysis?: Json | null
           description?: string | null
           id?: string
           key_topics?: string[]
