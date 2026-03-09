@@ -147,6 +147,7 @@ const AcademicPage = () => {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [extractedPdfTerms, setExtractedPdfTerms] = useState<string[]>([]);
   const [isExtractingPdf, setIsExtractingPdf] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   
   const [loadingConfig, setLoadingConfig] = useState(true);
   const [generating, setGenerating] = useState(false);
