@@ -74,12 +74,14 @@ const Layout = ({ children }: { children: ReactNode }) => {
       </div>
 
       {/* Sidebar */}
-      <AnimatePresence>
-        {(sidebarOpen || true) && (
+      <AnimatePresence mode="wait">
+        {(sidebarOpen || typeof window !== 'undefined' && window.innerWidth >= 1024) && (
           <motion.aside
-            className={`fixed lg:sticky top-0 right-0 h-screen w-64 bg-sidebar-background text-sidebar-foreground z-40 flex flex-col shadow-xl border-l border-sidebar-border transition-transform lg:translate-x-0 ${
-              sidebarOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'
-            }`}
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            className="fixed lg:sticky top-0 right-0 h-screen w-64 bg-sidebar-background text-sidebar-foreground z-40 flex flex-col shadow-xl border-l border-sidebar-border lg:translate-x-0"
           >
             {/* Logo */}
             <div className="p-6 border-b border-sidebar-border">
@@ -91,7 +93,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
             </div>
 
             {/* Nav */}
-            <nav className="flex-1 p-4 space-y-1">
+            <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
               {navItems.map(({ path, icon: Icon, label }) => {
                 const active = location.pathname === path;
                 return (
@@ -99,7 +101,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
                     key={path}
                     to={path}
                     onClick={() => setSidebarOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                    className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
                       active
                         ? 'bg-sidebar-accent text-sidebar-primary'
                         : 'text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground'
@@ -117,7 +119,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
                     key={path}
                     to={path}
                     onClick={() => setSidebarOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                    className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
                       active
                         ? 'bg-sidebar-accent text-sidebar-primary'
                         : 'text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground'
