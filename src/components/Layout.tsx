@@ -14,6 +14,9 @@ const navItems = [
   { path: '/flashcards', icon: Layers, label: 'بطاقات' },
   { path: '/achievements', icon: Trophy, label: 'الإنجازات' },
   { path: '/progress', icon: TrendingUp, label: 'التقدم' },
+];
+
+const adminItems = [
   { path: '/admin/curriculum', icon: ShieldAlert, label: 'لوحة الإدارة' },
 ];
 
