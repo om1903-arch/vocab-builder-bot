@@ -428,11 +428,15 @@ const AcademicPage = () => {
                       <SelectValue placeholder="اختر القسم..." />
                     </SelectTrigger>
                     <SelectContent>
-                      {currentDepartments.map(d => (
-                        <SelectItem key={d.department_en} value={d.department_en}>
-                          {d.department_ar}
-                        </SelectItem>
-                      ))}
+                      {currentDepartments.map(d => {
+                        const deptEn = d.department_en || d.name_en || '';
+                        const deptAr = d.department_ar || d.name_ar || '';
+                        return (
+                          <SelectItem key={deptEn} value={deptEn}>
+                            {deptAr}
+                          </SelectItem>
+                        );
+                      })}
                     </SelectContent>
                   </Select>
                 </div>
