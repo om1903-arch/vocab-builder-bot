@@ -19,6 +19,7 @@ import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/AdminDashboard";
 import Roleplay from "./pages/Roleplay";
 import PdfTutor from "./pages/PdfTutor";
+import Leaderboard from "./pages/Leaderboard";
 
 const queryClient = new QueryClient();
 
