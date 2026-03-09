@@ -94,7 +94,8 @@ Return ONLY valid JSON with this exact structure:
   "typical_topics": ["topic 1", "topic 2", "topic 3"],
   "key_terminology": ["term 1", "term 2", "term 3", "term 4", "term 5"],
   "learning_outcomes": ["outcome 1", "outcome 2"],
-  "academic_depth": "How this subject builds on other topics and its importance in the field (1 sentence)"
+  "academic_depth": "How this subject builds on other topics and its importance in the field (1 sentence)",
+  "suggested_references": ["Book or Paper 1", "Course or Website 2", "Reference 3"]
 }`,
                 },
               ],
