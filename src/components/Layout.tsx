@@ -58,15 +58,15 @@ const Layout = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row relative" dir="rtl">
+    <div className="min-h-screen flex flex-col lg:flex-row relative bg-background" dir="rtl">
       {/* Mobile Navbar */}
-      <div className="lg:hidden sticky top-0 w-full z-50 bg-sidebar-background border-b border-sidebar-border text-sidebar-foreground flex items-center justify-between p-4 rounded-none">
+      <div className="lg:hidden sticky top-0 w-full z-50 bg-card border-b border-border flex items-center justify-between p-4 shadow-sm">
         <div className="flex items-center gap-2">
           <BookOpen className="h-6 w-6 text-primary" />
-          <span className="font-bold text-lg">LinguaAI</span>
+          <span className="font-bold text-lg text-foreground">LinguaAI</span>
         </div>
         <button
-          className="p-2 rounded-lg hover:bg-foreground/5 transition-colors"
+          className="p-2 rounded-lg hover:bg-secondary transition-colors text-foreground"
           onClick={() => setSidebarOpen(!sidebarOpen)}
         >
           {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
