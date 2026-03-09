@@ -130,6 +130,15 @@ const Layout = ({ children }: { children: ReactNode }) => {
                 {dark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
                 <span className="text-sm">{dark ? 'وضع فاتح' : 'وضع ليلي'}</span>
               </button>
+              {installPrompt && (
+                <button
+                  onClick={handleInstallClick}
+                  className="flex items-center gap-3 px-4 py-2 w-full rounded-lg text-primary hover:bg-sidebar-accent/50 transition-colors"
+                >
+                  <Download className="h-5 w-5" />
+                  <span className="text-sm font-medium">تثبيت التطبيق</span>
+                </button>
+              )}
               <button
                 onClick={handleSignOut}
                 className="flex items-center gap-3 px-4 py-2 w-full rounded-lg text-destructive hover:bg-sidebar-accent/50 transition-colors"
