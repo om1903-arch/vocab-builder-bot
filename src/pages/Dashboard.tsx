@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import { BookOpen, BookMarked, Flame, Zap, Target, ArrowLeft } from 'lucide-react';
+import { DailyChallenges } from '@/components/DailyChallenges';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -105,6 +106,9 @@ const Dashboard = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Daily Challenges */}
+        <DailyChallenges />
 
         {/* Level test CTA */}
         {profile?.level === 'beginner' && (

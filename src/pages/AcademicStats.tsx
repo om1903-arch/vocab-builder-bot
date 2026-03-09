@@ -130,34 +130,71 @@ export default function AcademicStats() {
         </Card>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>تقدمك الشهري في المصطلحات</CardTitle>
-          <CardDescription>عدد المصطلحات الأكاديمية التي تعلمتها كل شهر</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {stats?.chartData && stats.chartData.length > 0 ? (
-            <div className="h-[300px] w-full mt-4" dir="ltr">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={stats.chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} />
-                  <YAxis axisLine={false} tickLine={false} />
-                  <Tooltip 
-                    cursor={{ fill: 'rgba(0,0,0,0.05)' }}
-                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}
-                  />
-                  <Bar dataKey="words" fill="#2563eb" radius={[4, 4, 0, 0]} name="مصطلحات" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          ) : (
-            <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-              لا توجد بيانات كافية لعرض الرسم البياني
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>تقدمك الشهري في المصطلحات</CardTitle>
+            <CardDescription>عدد المصطلحات الأكاديمية التي تعلمتها كل شهر</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {stats?.chartData && stats.chartData.length > 0 ? (
+              <div className="h-[300px] w-full mt-4" dir="ltr">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={stats.chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} />
+                    <YAxis axisLine={false} tickLine={false} />
+                    <Tooltip 
+                      cursor={{ fill: 'rgba(0,0,0,0.05)' }}
+                      contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}
+                    />
+                    <Bar dataKey="words" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} name="مصطلحات" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+                لا توجد بيانات كافية لعرض الرسم البياني
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>توزيع المصطلحات</CardTitle>
+            <CardDescription>الكلمات حسب الإضافة الشهرية</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {stats?.chartData && stats.chartData.length > 0 ? (
+              <div className="h-[300px] w-full mt-4" dir="ltr">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={stats.chartData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={100}
+                      paddingAngle={5}
+                      dataKey="words"
+                    >
+                      {stats.chartData.map((entry: any, index: number) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+                لا توجد بيانات كافية
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

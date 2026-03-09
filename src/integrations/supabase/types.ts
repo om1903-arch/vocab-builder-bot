@@ -53,6 +53,42 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_challenges: {
+        Row: {
+          challenge_type: string
+          created_at: string
+          current_count: number
+          expires_at: string
+          id: string
+          is_completed: boolean
+          target_count: number
+          user_id: string
+          xp_reward: number
+        }
+        Insert: {
+          challenge_type: string
+          created_at?: string
+          current_count?: number
+          expires_at?: string
+          id?: string
+          is_completed?: boolean
+          target_count?: number
+          user_id: string
+          xp_reward?: number
+        }
+        Update: {
+          challenge_type?: string
+          created_at?: string
+          current_count?: number
+          expires_at?: string
+          id?: string
+          is_completed?: boolean
+          target_count?: number
+          user_id?: string
+          xp_reward?: number
+        }
+        Relationships: []
+      }
       daily_progress: {
         Row: {
           articles_read: number
