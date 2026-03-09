@@ -20,8 +20,10 @@ interface Subject {
 }
 
 interface Department {
-  department_ar: string;
-  department_en: string;
+  department_ar?: string;
+  department_en?: string;
+  name_ar?: string;
+  name_en?: string;
   subjects: Subject[];
 }
 
@@ -342,7 +344,7 @@ const AcademicPage = () => {
 
   // Helper arrays for selects
   const currentDepartments = selectedFaculty?.structure || [];
-  const currentSubjects = currentDepartments.find(d => d.department_en === selectedDeptEn)?.subjects || [];
+  const currentSubjects = currentDepartments.find(d => (d.department_en || d.name_en) === selectedDeptEn)?.subjects || [];
 
   return (
     <div className="space-y-6 animate-fade-in" dir="rtl">
@@ -426,11 +428,15 @@ const AcademicPage = () => {
                       <SelectValue placeholder="اختر القسم..." />
                     </SelectTrigger>
                     <SelectContent>
-                      {currentDepartments.map(d => (
-                        <SelectItem key={d.department_en} value={d.department_en}>
-                          {d.department_ar}
-                        </SelectItem>
-                      ))}
+                      {currentDepartments.map(d => {
+                        const deptEn = d.department_en || d.name_en || '';
+                        const deptAr = d.department_ar || d.name_ar || '';
+                        return (
+                          <SelectItem key={deptEn} value={deptEn}>
+                            {deptAr}
+                          </SelectItem>
+                        );
+                      })}
                     </SelectContent>
                   </Select>
                 </div>
