@@ -60,7 +60,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
   return (
     <div className="min-h-screen flex relative" dir="rtl">
       {/* Mobile Navbar */}
-      <div className="lg:hidden fixed top-0 w-full z-50 glass-card border-x-0 border-t-0 flex items-center justify-between p-4 rounded-none">
+      <div className="lg:hidden sticky top-0 w-full z-50 bg-sidebar-background border-b border-sidebar-border text-sidebar-foreground flex items-center justify-between p-4 rounded-none">
         <div className="flex items-center gap-2">
           <BookOpen className="h-6 w-6 text-primary" />
           <span className="font-bold text-lg">LinguaAI</span>
