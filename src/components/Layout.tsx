@@ -10,6 +10,7 @@ const navItems = [
   { path: '/articles', icon: BookOpen, label: 'المقالات' },
   { path: '/academic', icon: GraduationCap, label: 'أكاديمي' },
   { path: '/academic/stats', icon: BarChart, label: 'إحصائياتي' },
+  { path: '/pdf-tutor', icon: FileText, label: 'مدرس PDF' },
   { path: '/dictionary', icon: BookMarked, label: 'القاموس' },
   { path: '/flashcards', icon: Layers, label: 'بطاقات' },
   { path: '/roleplay', icon: Mic, label: 'محاكاة' },
