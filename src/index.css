@@ -97,8 +97,21 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground min-h-screen;
     font-family: 'IBM Plex Sans Arabic', 'Space Grotesk', sans-serif;
+    background-image: 
+      radial-gradient(circle at 0% 0%, hsla(var(--primary) / 0.12) 0, transparent 40%),
+      radial-gradient(circle at 100% 0%, hsla(var(--accent) / 0.12) 0, transparent 40%),
+      radial-gradient(circle at 100% 100%, hsla(var(--primary) / 0.12) 0, transparent 40%),
+      radial-gradient(circle at 0% 100%, hsla(var(--accent) / 0.12) 0, transparent 40%);
+    background-attachment: fixed;
+  }
+  .dark body {
+    background-image: 
+      radial-gradient(circle at 0% 0%, hsla(var(--primary) / 0.15) 0, transparent 40%),
+      radial-gradient(circle at 100% 0%, hsla(var(--accent) / 0.15) 0, transparent 40%),
+      radial-gradient(circle at 100% 100%, hsla(var(--primary) / 0.15) 0, transparent 40%),
+      radial-gradient(circle at 0% 100%, hsla(var(--accent) / 0.15) 0, transparent 40%);
   }
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Space Grotesk', 'IBM Plex Sans Arabic', sans-serif;
@@ -114,7 +127,15 @@
     background-image: linear-gradient(135deg, hsl(168 65% 38%), hsl(168 65% 55%));
   }
   .glass-card {
-    @apply backdrop-blur-xl bg-card/80 border border-border/50;
+    @apply backdrop-blur-2xl border transition-all duration-300;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.1));
+    border-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+  }
+  .dark .glass-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02));
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
   }
   .article-text {
     font-family: 'Space Grotesk', sans-serif;
