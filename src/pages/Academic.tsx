@@ -20,8 +20,10 @@ interface Subject {
 }
 
 interface Department {
-  department_ar: string;
-  department_en: string;
+  department_ar?: string;
+  department_en?: string;
+  name_ar?: string;
+  name_en?: string;
   subjects: Subject[];
 }
 
