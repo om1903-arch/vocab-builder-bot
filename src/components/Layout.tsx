@@ -58,7 +58,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <div className="min-h-screen flex relative" dir="rtl">
+    <div className="min-h-screen flex flex-col lg:flex-row relative" dir="rtl">
       {/* Mobile Navbar */}
       <div className="lg:hidden sticky top-0 w-full z-50 bg-sidebar-background border-b border-sidebar-border text-sidebar-foreground flex items-center justify-between p-4 rounded-none">
         <div className="flex items-center gap-2">
