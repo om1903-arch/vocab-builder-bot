@@ -629,9 +629,10 @@ const AcademicPage = () => {
 };
 
 // Helper for display
-function selectedDepartmentsText(faculty: Faculty, deptEn: string) {
-  const dept = faculty.structure?.find(d => d.department_en === deptEn);
-  return dept ? dept.department_ar : '';
+function selectedDepartmentsText(faculty: Faculty | null, deptEn: string) {
+  if (!faculty || !faculty.structure) return '';
+  const dept = faculty.structure.find(d => (d.department_en || d.name_en) === deptEn);
+  return dept ? (dept.department_ar || dept.name_ar || '') : '';
 }
 
 export default AcademicPage;
