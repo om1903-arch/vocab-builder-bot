@@ -17,6 +17,7 @@ import AcademicPage from "./pages/Academic";
 import AcademicStats from "./pages/AcademicStats";
 import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/AdminDashboard";
+import Roleplay from "./pages/Roleplay";
 
 const queryClient = new QueryClient();
 
@@ -54,6 +55,7 @@ const App = () => (
             <Route path="/achievements" element={<ProtectedRoute><AchievementsPage /></ProtectedRoute>} />
             <Route path="/academic" element={<ProtectedRoute><AcademicPage /></ProtectedRoute>} />
             <Route path="/academic/stats" element={<ProtectedRoute><AcademicStats /></ProtectedRoute>} />
+            <Route path="/roleplay" element={<ProtectedRoute><Roleplay /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

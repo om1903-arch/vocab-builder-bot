@@ -1,8 +1,8 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { BookOpen, LayoutDashboard, BookMarked, TrendingUp, LogOut, Menu, X, Sparkles, Sun, Moon, Layers, Trophy, GraduationCap, BarChart, ShieldAlert } from 'lucide-react';
+import { BookOpen, LayoutDashboard, BookMarked, TrendingUp, LogOut, Menu, X, Sparkles, Sun, Moon, Layers, Trophy, GraduationCap, BarChart, ShieldAlert, Download, Mic } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const navItems = [
@@ -12,6 +12,7 @@ const navItems = [
   { path: '/academic/stats', icon: BarChart, label: 'إحصائياتي' },
   { path: '/dictionary', icon: BookMarked, label: 'القاموس' },
   { path: '/flashcards', icon: Layers, label: 'بطاقات' },
+  { path: '/roleplay', icon: Mic, label: 'محاكاة' },
   { path: '/achievements', icon: Trophy, label: 'الإنجازات' },
   { path: '/progress', icon: TrendingUp, label: 'التقدم' },
 ];
@@ -26,6 +27,23 @@ const Layout = ({ children }: { children: ReactNode }) => {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'));
+  const [installPrompt, setInstallPrompt] = useState<any>(null);
+
+  useEffect(() => {
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      setInstallPrompt(e);
+    });
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    const { outcome } = await installPrompt.userChoice;
+    if (outcome === 'accepted') {
+      setInstallPrompt(null);
+    }
+  };
 
   const toggleDark = () => {
     document.documentElement.classList.toggle('dark');
@@ -113,6 +131,15 @@ const Layout = ({ children }: { children: ReactNode }) => {
                 {dark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
                 <span className="text-sm">{dark ? 'وضع فاتح' : 'وضع ليلي'}</span>
               </button>
+              {installPrompt && (
+                <button
+                  onClick={handleInstallClick}
+                  className="flex items-center gap-3 px-4 py-2 w-full rounded-lg text-primary hover:bg-sidebar-accent/50 transition-colors"
+                >
+                  <Download className="h-5 w-5" />
+                  <span className="text-sm font-medium">تثبيت التطبيق</span>
+                </button>
+              )}
               <button
                 onClick={handleSignOut}
                 className="flex items-center gap-3 px-4 py-2 w-full rounded-lg text-destructive hover:bg-sidebar-accent/50 transition-colors"

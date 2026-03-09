@@ -8,7 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Volume2, Trash2, Search, Brain, Loader2, CheckCircle, XCircle, Award, BookMarked } from 'lucide-react';
+import { Volume2, Trash2, Search, Brain, Loader2, CheckCircle, XCircle, Award, BookMarked, Mic } from 'lucide-react';
+import PronunciationTester from '@/components/PronunciationTester';
 
 interface DictEntry {
   id: string;
@@ -284,6 +285,9 @@ const Dictionary = () => {
                             "{entry.context.substring(0, 100)}..."
                           </div>
                         )}
+                        <div className="mt-2 w-full max-w-sm">
+                           <PronunciationTester word={entry.word} />
+                        </div>
                       </div>
                       <Button variant="ghost" size="icon" className="shrink-0 text-destructive" onClick={() => deleteEntry(entry.id)}>
                         <Trash2 className="h-4 w-4" />
