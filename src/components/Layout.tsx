@@ -81,19 +81,19 @@ const Layout = ({ children }: { children: ReactNode }) => {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed lg:sticky top-0 right-0 h-screen w-64 bg-sidebar-background text-sidebar-foreground z-40 flex flex-col shadow-xl border-l border-sidebar-border lg:translate-x-0"
+            className="fixed lg:sticky top-0 right-0 h-screen w-64 bg-card text-card-foreground z-40 flex flex-col shadow-lg lg:shadow-none border-l border-border lg:translate-x-0"
           >
             {/* Logo */}
-            <div className="p-6 border-b border-sidebar-border">
+            <div className="p-6 border-b border-border">
               <div className="flex items-center gap-2">
-                <BookOpen className="h-7 w-7 text-sidebar-primary" />
-                <Sparkles className="h-4 w-4 text-accent" />
-                <span className="text-xl font-bold">LinguaAI</span>
+                <BookOpen className="h-7 w-7 text-primary" />
+                <Sparkles className="h-4 w-4 text-accent animate-pulse" />
+                <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-l from-primary to-accent">LinguaAI</span>
               </div>
             </div>
 
             {/* Nav */}
-            <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+            <nav className="flex-1 p-4 space-y-2 overflow-y-auto scrollbar-hide">
               {navItems.map(({ path, icon: Icon, label }) => {
                 const active = location.pathname === path;
                 return (
@@ -101,61 +101,70 @@ const Layout = ({ children }: { children: ReactNode }) => {
                     key={path}
                     to={path}
                     onClick={() => setSidebarOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                    className={`group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
                       active
-                        ? 'bg-sidebar-accent text-sidebar-primary'
-                        : 'text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground'
+                        ? 'bg-primary/10 text-primary font-semibold'
+                        : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
                     }`}
                   >
-                    <Icon className="h-5 w-5" />
-                    <span className="font-medium">{label}</span>
+                    <Icon className={`h-5 w-5 transition-transform duration-300 ${!active && 'group-hover:scale-110 group-hover:rotate-6'}`} />
+                    <span>{label}</span>
                   </Link>
                 );
               })}
-              {isAdmin && adminItems.map(({ path, icon: Icon, label }) => {
-                const active = location.pathname === path;
-                return (
-                  <Link
-                    key={path}
-                    to={path}
-                    onClick={() => setSidebarOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                      active
-                        ? 'bg-sidebar-accent text-sidebar-primary'
-                        : 'text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground'
-                    }`}
-                  >
-                    <Icon className="h-5 w-5" />
-                    <span className="font-medium">{label}</span>
-                  </Link>
-                );
-              })}
+              {isAdmin && (
+                <>
+                  <div className="h-px bg-border my-4" />
+                  {adminItems.map(({ path, icon: Icon, label }) => {
+                    const active = location.pathname === path;
+                    return (
+                      <Link
+                        key={path}
+                        to={path}
+                        onClick={() => setSidebarOpen(false)}
+                        className={`group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
+                          active
+                            ? 'bg-primary/10 text-primary font-semibold'
+                            : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
+                        }`}
+                      >
+                        <Icon className={`h-5 w-5 transition-transform duration-300 ${!active && 'group-hover:scale-110 group-hover:rotate-6'}`} />
+                        <span>{label}</span>
+                      </Link>
+                    );
+                  })}
+                </>
+              )}
             </nav>
 
             {/* Bottom */}
-            <div className="p-4 border-t border-sidebar-border space-y-2">
+            <div className="p-4 border-t border-border space-y-2 bg-card/50">
               <button
                 onClick={toggleDark}
-                className="flex items-center gap-3 px-4 py-2 w-full rounded-lg text-sidebar-foreground/70 hover:bg-sidebar-accent/50 transition-colors"
+                className="group flex items-center gap-3 px-4 py-3 w-full rounded-xl text-muted-foreground hover:bg-secondary hover:text-foreground transition-all duration-300"
               >
-                {dark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-                <span className="text-sm">{dark ? 'وضع فاتح' : 'وضع ليلي'}</span>
+                {dark ? (
+                  <Sun className="h-5 w-5 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-90" />
+                ) : (
+                  <Moon className="h-5 w-5 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-12" />
+                )}
+                <span className="font-medium">{dark ? 'وضع فاتح' : 'وضع ليلي'}</span>
               </button>
               {installPrompt && (
                 <button
                   onClick={handleInstallClick}
-                  className="flex items-center gap-3 px-4 py-2 w-full rounded-lg text-primary hover:bg-sidebar-accent/50 transition-colors"
+                  className="group flex items-center gap-3 px-4 py-3 w-full rounded-xl text-primary hover:bg-primary/10 transition-all duration-300"
                 >
-                  <Download className="h-5 w-5" />
-                  <span className="text-sm font-medium">تثبيت التطبيق</span>
+                  <Download className="h-5 w-5 transition-transform duration-300 group-hover:scale-110 group-hover:-translate-y-1" />
+                  <span className="font-medium">تثبيت التطبيق</span>
                 </button>
               )}
               <button
                 onClick={handleSignOut}
-                className="flex items-center gap-3 px-4 py-2 w-full rounded-lg text-destructive hover:bg-sidebar-accent/50 transition-colors"
+                className="group flex items-center gap-3 px-4 py-3 w-full rounded-xl text-destructive/80 hover:bg-destructive/10 hover:text-destructive transition-all duration-300"
               >
-                <LogOut className="h-5 w-5" />
-                <span className="text-sm">خروج</span>
+                <LogOut className="h-5 w-5 transition-transform duration-300 group-hover:scale-110 group-hover:-translate-x-1" />
+                <span className="font-medium">تسجيل الخروج</span>
               </button>
             </div>
           </motion.aside>
