@@ -77,7 +77,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
       <AnimatePresence>
         {(sidebarOpen || true) && (
           <motion.aside
-            className={`fixed lg:sticky top-0 right-0 h-screen w-64 glass-card border-l-0 border-r-0 border-y-0 text-sidebar-foreground z-40 flex flex-col transition-transform lg:translate-x-0 ${
+            className={`fixed lg:sticky top-0 right-0 h-screen w-64 bg-sidebar-background text-sidebar-foreground z-40 flex flex-col shadow-xl border-l border-sidebar-border transition-transform lg:translate-x-0 ${
               sidebarOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'
             }`}
           >
