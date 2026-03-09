@@ -344,7 +344,7 @@ const AcademicPage = () => {
 
   // Helper arrays for selects
   const currentDepartments = selectedFaculty?.structure || [];
-  const currentSubjects = currentDepartments.find(d => d.department_en === selectedDeptEn)?.subjects || [];
+  const currentSubjects = currentDepartments.find(d => (d.department_en || d.name_en) === selectedDeptEn)?.subjects || [];
 
   return (
     <div className="space-y-6 animate-fade-in" dir="rtl">
