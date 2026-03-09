@@ -32,3 +32,6 @@ verify_jwt = false
 
 [functions.seed-curriculum-analysis]
 verify_jwt = false
+
+[functions.chat-pdf]
+verify_jwt = false

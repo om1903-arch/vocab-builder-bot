@@ -2,7 +2,7 @@ import { ReactNode, useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { BookOpen, LayoutDashboard, BookMarked, TrendingUp, LogOut, Menu, X, Sparkles, Sun, Moon, Layers, Trophy, GraduationCap, BarChart, ShieldAlert, Download, Mic } from 'lucide-react';
+import { BookOpen, LayoutDashboard, BookMarked, TrendingUp, LogOut, Menu, X, Sparkles, Sun, Moon, Layers, Trophy, GraduationCap, BarChart, ShieldAlert, Download, Mic, FileText } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const navItems = [
@@ -10,6 +10,7 @@ const navItems = [
   { path: '/articles', icon: BookOpen, label: 'المقالات' },
   { path: '/academic', icon: GraduationCap, label: 'أكاديمي' },
   { path: '/academic/stats', icon: BarChart, label: 'إحصائياتي' },
+  { path: '/pdf-tutor', icon: FileText, label: 'مدرس PDF' },
   { path: '/dictionary', icon: BookMarked, label: 'القاموس' },
   { path: '/flashcards', icon: Layers, label: 'بطاقات' },
   { path: '/roleplay', icon: Mic, label: 'محاكاة' },

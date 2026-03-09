@@ -18,6 +18,7 @@ import AcademicStats from "./pages/AcademicStats";
 import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/AdminDashboard";
 import Roleplay from "./pages/Roleplay";
+import PdfTutor from "./pages/PdfTutor";
 
 const queryClient = new QueryClient();
 
@@ -56,6 +57,7 @@ const App = () => (
             <Route path="/academic" element={<ProtectedRoute><AcademicPage /></ProtectedRoute>} />
             <Route path="/academic/stats" element={<ProtectedRoute><AcademicStats /></ProtectedRoute>} />
             <Route path="/roleplay" element={<ProtectedRoute><Roleplay /></ProtectedRoute>} />
+            <Route path="/pdf-tutor" element={<ProtectedRoute><PdfTutor /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
