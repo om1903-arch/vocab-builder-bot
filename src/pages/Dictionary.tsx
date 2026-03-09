@@ -8,7 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Volume2, Trash2, Search, Brain, Loader2, CheckCircle, XCircle, Award, BookMarked } from 'lucide-react';
+import { Volume2, Trash2, Search, Brain, Loader2, CheckCircle, XCircle, Award, BookMarked, Mic } from 'lucide-react';
+import PronunciationTester from '@/components/PronunciationTester';
 
 interface DictEntry {
   id: string;
