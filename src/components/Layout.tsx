@@ -21,7 +21,7 @@ const adminItems = [
 ];
 
 const Layout = ({ children }: { children: ReactNode }) => {
-  const { signOut, user } = useAuth();
+  const { signOut, user, isAdmin } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
