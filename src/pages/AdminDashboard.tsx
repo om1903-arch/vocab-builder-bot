@@ -71,6 +71,16 @@ const AdminDashboard = () => {
     );
   }
 
+  if (!isAdmin) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center" dir="rtl">
+        <ShieldAlert className="h-16 w-16 text-destructive mb-4" />
+        <h1 className="text-2xl font-bold mb-2">غير مصرح</h1>
+        <p className="text-muted-foreground">ليس لديك صلاحية الوصول إلى هذه الصفحة.</p>
+      </div>
+    );
+  }
+
   // Calculate overall stats
   let totalSubjects = 0;
   let analyzedSubjects = 0;

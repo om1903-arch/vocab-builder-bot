@@ -84,6 +84,24 @@ const Layout = ({ children }: { children: ReactNode }) => {
                   </Link>
                 );
               })}
+              {isAdmin && adminItems.map(({ path, icon: Icon, label }) => {
+                const active = location.pathname === path;
+                return (
+                  <Link
+                    key={path}
+                    to={path}
+                    onClick={() => setSidebarOpen(false)}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                      active
+                        ? 'bg-sidebar-accent text-sidebar-primary'
+                        : 'text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground'
+                    }`}
+                  >
+                    <Icon className="h-5 w-5" />
+                    <span className="font-medium">{label}</span>
+                  </Link>
+                );
+              })}
             </nav>
 
             {/* Bottom */}
