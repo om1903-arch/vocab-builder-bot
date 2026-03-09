@@ -107,6 +107,9 @@ const Dashboard = () => {
           </Card>
         </div>
 
+        {/* Daily Challenges */}
+        <DailyChallenges />
+
         {/* Level test CTA */}
         {profile?.level === 'beginner' && (
           <Card className="border-primary/30 bg-primary/5">

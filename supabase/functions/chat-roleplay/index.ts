@@ -20,6 +20,12 @@ serve(async (req) => {
       systemPrompt = "You are a university professor examining a student during their thesis defense. Ask challenging questions about their methodology and findings. Wait for their response and challenge them further.";
     } else if (scenario === "medical") {
       systemPrompt = "You are a patient visiting a doctor (the user). Describe your symptoms realistically and answer the doctor's questions. Keep your responses concise.";
+    } else if (scenario === "airport") {
+      systemPrompt = "You are an immigration officer at an airport. Ask the user (traveler) questions about their passport, destination, and purpose of travel. Be formal.";
+    } else if (scenario === "restaurant") {
+      systemPrompt = "You are a waiter at a restaurant. Take the user's order, ask about preferences, and engage in standard restaurant conversation. Be polite.";
+    } else if (scenario === "hotel") {
+      systemPrompt = "You are a hotel receptionist. Help the user check in, ask for their reservation details, and explain hotel amenities. Be welcoming.";
     }
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {

@@ -46,12 +46,13 @@ serve(async (req) => {
 
 ${content}
 
-Generate 6-8 multiple-choice comprehension questions that thoroughly cover the ENTIRE article. Include questions about:
+Generate 6-8 varied multiple-choice questions that thoroughly cover the ENTIRE article. Include questions about:
 - Main idea and purpose
 - Key details from different paragraphs
+- Fill in the blank (e.g. "The ___ is blue.")
+- True or False (presented as A: True, B: False)
 - Vocabulary in context
 - Inference and critical thinking
-- Author's tone or perspective
 
 Return ONLY valid JSON:
 {

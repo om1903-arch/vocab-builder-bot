@@ -159,6 +159,9 @@ export default function Roleplay() {
               <SelectItem value="interview">مقابلة عمل (Job Interview)</SelectItem>
               <SelectItem value="thesis">مناقشة رسالة (Thesis Defense)</SelectItem>
               <SelectItem value="medical">استشارة طبية (Medical Consultation)</SelectItem>
+              <SelectItem value="airport">في المطار (At the Airport)</SelectItem>
+              <SelectItem value="restaurant">في المطعم (At the Restaurant)</SelectItem>
+              <SelectItem value="hotel">في الفندق (At the Hotel)</SelectItem>
             </SelectContent>
           </Select>
         </div>
