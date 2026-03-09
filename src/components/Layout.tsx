@@ -58,13 +58,19 @@ const Layout = ({ children }: { children: ReactNode }) => {
 
   return (
     <div className="min-h-screen flex relative" dir="rtl">
-      {/* Mobile menu button */}
-      <button
-        className="fixed top-4 right-4 z-50 lg:hidden p-2 rounded-lg glass-card text-foreground"
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-      >
-        {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-      </button>
+      {/* Mobile Navbar */}
+      <div className="lg:hidden fixed top-0 w-full z-50 glass-card border-x-0 border-t-0 flex items-center justify-between p-4 rounded-none">
+        <div className="flex items-center gap-2">
+          <BookOpen className="h-6 w-6 text-primary" />
+          <span className="font-bold text-lg">LinguaAI</span>
+        </div>
+        <button
+          className="p-2 rounded-lg hover:bg-foreground/5 transition-colors"
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+        >
+          {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </button>
+      </div>
 
       {/* Sidebar */}
       <AnimatePresence>
