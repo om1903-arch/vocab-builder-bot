@@ -30,8 +30,8 @@ serve(async (req) => {
       return new Response("Missing text", { status: 400, headers: corsHeaders });
     }
 
-    const voice = voiceId || "JBFqnCBsd6RMkjVDRZzb";
-    const cacheKey = await hashKey(text, voice);
+    const voice = voiceId || "EXAVITQu4vr4xnSDxMaL";
+    const cacheKey = await hashKey(text, voice + "|v2");
     const filePath = `${cacheKey}.mp3`;
 
     // Init Supabase client with service role
@@ -65,11 +65,13 @@ serve(async (req) => {
         },
         body: JSON.stringify({
           text: text.substring(0, 5000),
-          model_id: "eleven_turbo_v2_5",
+          model_id: "eleven_multilingual_v2",
           voice_settings: {
-            stability: 0.5,
-            similarity_boost: 0.75,
-            speed: 0.9,
+            stability: 0.7,
+            similarity_boost: 0.8,
+            style: 0.1,
+            use_speaker_boost: true,
+            speed: 0.95,
           },
         }),
       }

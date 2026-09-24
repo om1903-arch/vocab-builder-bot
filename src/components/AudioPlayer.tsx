@@ -13,7 +13,7 @@ interface AudioPlayerProps {
 
 const AudioPlayer = ({ text, label, compact = false, onCharIndex, onPlayStateChange }: AudioPlayerProps) => {
   const [status, setStatus] = useState<'idle' | 'loading' | 'playing' | 'paused'>('idle');
-  const [speed, setSpeed] = useState(0.85);
+  const [speed, setSpeed] = useState(1);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const usingWebSpeech = useRef(false);
@@ -123,7 +123,7 @@ const AudioPlayer = ({ text, label, compact = false, onCharIndex, onPlayStateCha
     updateStatus('loading');
     
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 5000); // 5s max wait
+    const timeout = setTimeout(() => controller.abort(), 20000); // 5s max wait
 
     try {
       const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`;
@@ -134,7 +134,7 @@ const AudioPlayer = ({ text, label, compact = false, onCharIndex, onPlayStateCha
           'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
           'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
-        body: JSON.stringify({ text, voiceId: 'JBFqnCBsd6RMkjVDRZzb' }),
+        body: JSON.stringify({ text, voiceId: 'EXAVITQu4vr4xnSDxMaL' }),
         signal: controller.signal,
       });
       clearTimeout(timeout);
