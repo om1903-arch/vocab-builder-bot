@@ -53,6 +53,25 @@ serve(async (req) => {
     const levelDesc = levelDescriptions[level] || levelDescriptions.intermediate;
     const catName = categoryNames[category] || category;
 
+    // Avoid repeats: fetch user's recent titles
+    let recentTitles: string[] = [];
+    try {
+      const { data: recent } = await supabase
+        .from("articles").select("title")
+        .eq("user_id", claims.claims.sub)
+        .order("created_at", { ascending: false }).limit(30);
+      recentTitles = (recent || []).map((r: any) => r.title).filter(Boolean);
+    } catch (_) { /* ignore */ }
+
+    const angles = [
+      "a surprising recent discovery", "a profile of an influential person", "a practical how-to guide",
+      "a debate with pros and cons", "a little-known historical fact", "a future prediction",
+      "a real-world case study", "a common myth and the truth", "a day-in-the-life story",
+      "a comparison between two countries", "an interview-style piece", "a beginner's explainer of one concept",
+    ];
+    const angle = angles[Math.floor(Math.random() * angles.length)];
+    const seed = crypto.randomUUID().slice(0, 8);
+
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -70,8 +89,8 @@ serve(async (req) => {
             role: "user",
             content: `Generate an educational English article about ${catName} for a student at ${levelDesc}.
 
-The article should be engaging, informative, and about a current/interesting topic in this field.
-
+Pick a SPECIFIC, narrow sub-topic within ${catName} and write it as ${angle}. Be original (variation id: ${seed}).
+${recentTitles.length ? `Do NOT repeat or closely resemble any of these previous articles:\n- ${recentTitles.join("\n- ")}\n` : ""}
 Return ONLY valid JSON with this structure:
 {
   "title": "Article title in English",
@@ -82,7 +101,7 @@ Return ONLY valid JSON with this structure:
 The key_words should be 5-8 important vocabulary words from the article that the student should learn.`,
           },
         ],
-        temperature: 0.8,
+        temperature: 1.0,
       }),
     });
 
